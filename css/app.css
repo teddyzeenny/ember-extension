@@ -11,6 +11,10 @@
   -webkit-flex-direction: row;
 }
 
+.app__left-col {
+  width: 90px;
+}
+
 .app__main {
   -webkit-flex-grow: 1;
 }

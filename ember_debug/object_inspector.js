@@ -110,7 +110,8 @@ var ObjectInspector = Ember.Object.extend(PortMixin, {
 
   mixinsForObject: function(object) {
     var mixins = Ember.Mixin.mixins(object),
-        mixinDetails = [];
+        mixinDetails = [],
+        self = this;
 
     var ownProps = propertiesForMixin({ mixins: [{ properties: object }] });
     mixinDetails.push({ name: "Own Properties", properties: ownProps });
@@ -123,7 +124,15 @@ var ObjectInspector = Ember.Object.extend(PortMixin, {
 
     applyMixinOverrides(mixinDetails);
 
-    return { objectId: this.retainObject(object), mixins: mixinDetails };
+    var objectId = this.retainObject(object);
+
+    Ember.A(mixinDetails).forEach(function(item, mixinIndex) {
+      Ember.A(item.properties).forEach(function(prop) {
+        self.bindPropertyToDebugger({ objectId: objectId, property: prop.name, mixinIndex: mixinIndex} );
+      });
+    });
+
+    return { objectId: objectId, mixins: mixinDetails };
   },
 
   valueForObjectProperty: function(objectId, property, mixinIndex) {

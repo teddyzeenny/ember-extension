@@ -16,9 +16,6 @@
   background: #d6dde5;
 }
 
-body.inactive .app__nav-holder {
-  background: #e8e8e8;
-}
 
 .app__main {
   -webkit-flex: 1;
@@ -31,4 +28,9 @@ body.inactive .app__nav-holder {
   width: 500px;
   height: 100%;
   overflow: auto;
+}
+
+/* Modifier: state = inactive */
+.app_state_inactive .app__nav-holder {
+  background: #e8e8e8;
 }

@@ -112,8 +112,8 @@ if (typeof define !== 'function' && typeof requireModule !== 'function') {
 }());
 
 define("ember_debug",
-  ["port","object_inspector","view_debug","route_debug"],
-  function(Port, ObjectInspector, ViewDebug, RouteDebug) {
+  ["port","object_inspector","view_debug","route_debug","data_debug"],
+  function(Port, ObjectInspector, ViewDebug, RouteDebug, DataDebug) {
     "use strict";
 
     console.debug("Ember Debugger Active");
@@ -154,6 +154,7 @@ define("ember_debug",
         this.setDebugHandler('objectInspector', ObjectInspector);
         this.setDebugHandler('routeDebug', RouteDebug);
         this.setDebugHandler('viewDebug', ViewDebug);
+        this.setDebugHandler('dataDebug', DataDebug);
 
         this.viewDebug.sendTree();
       }

@@ -111,6 +111,137 @@ if (typeof define !== 'function' && typeof requireModule !== 'function') {
 
 }());
 
+define("data_adapter",
+  [],
+  function() {
+    "use strict";
+    var get = Ember.get;
+
+    var DataAdapter = Ember.Object.extend({
+      application: null,
+
+      findModelTypes: function() {
+        var namespaces = Ember.Namespace.NAMESPACES;
+        var ModelTypes = [];
+        namespaces.forEach(function(namespace) {
+          if (namespace === Ember || namespace === window.DS) {
+            return true;
+          }
+          for (var key in namespace) {
+            var ModelType = namespace[key];
+            if (window.DS.Model.detect(ModelType)) {
+              ModelTypes.push(ModelType);
+            }
+          }
+        });
+        return ModelTypes;
+      },
+
+
+      getCountRecords: function(ModelType) {
+        var store = this.get('application.__container__').lookup('store:main');
+        return store.all(ModelType).get('length');
+      },
+
+
+
+      findRecords: function(typeName) {
+        var store = this.get('application.__container__').lookup('store:main');
+
+        var recordArray = store.all(get(Ember.lookup, typeName));
+        return recordArray.map(function(record) {
+          var obj = {
+            id: get(record, 'id')
+          };
+          record.eachAttribute(function(name) {
+            obj[name] = get(record, name);
+          });
+          return obj;
+        });
+      },
+
+
+
+      findRecord: function(typeName, id) {
+        var store = this.get('application.__container__').lookup('store:main');
+        return store.find(get(Ember.lookup, typeName), id);
+      }
+
+
+    });
+
+
+    return DataAdapter;
+  });
+define("data_debug",
+  ["mixins/port_mixin","data_adapter"],
+  function(PortMixin, DataAdapter) {
+    "use strict";
+
+    var classify = Ember.String.classify, get = Ember.get;
+
+
+    var DataDebug = Ember.Object.extend(PortMixin, {
+      init: function() {
+        this._super();
+        this.adapter = DataAdapter.create({ application: this.get('application') });
+      },
+
+      adapter: null,
+
+      namespace: null,
+
+      port: Ember.computed.alias('namespace.port'),
+      application: Ember.computed.alias('namespace.application'),
+      objectInspector: Ember.computed.alias('namespace.objectInspector'),
+
+      portNamespace: 'data',
+
+
+      // THIS WILL BE PULLED INTO AN ADAPTER ==============
+
+      getModelTypes: function() {
+        var modelTypes = this.adapter.findModelTypes(), self = this;
+        return modelTypes.map(function(ModelType) {
+          var attributes = [ { name: 'id' } ];
+          get(ModelType, 'attributes').forEach(function(name, meta) {
+            attributes.push({ name: name });
+          });
+          return {
+            name: ModelType.toString(),
+            count: self.adapter.getCountRecords(ModelType),
+            attributes: attributes
+          };
+        });
+      },
+
+
+      //==================================================
+
+      messages: {
+        getModelTypes: function() {
+          this.sendMessage('modelTypes', {
+            modelTypes: this.getModelTypes()
+          });
+        },
+
+        getRecords: function(message) {
+          var records = this.adapter.findRecords(message.modelType);
+          this.sendMessage('records', {
+            records: records
+          });
+        },
+
+        inspectModel: function(message) {
+          var record = this.adapter.findRecord(message.modelType, message.id);
+          this.get('objectInspector').sendObject(record);
+        }
+      }
+    });
+
+
+    return DataDebug;
+  });
 define("ember_debug",
   ["port","object_inspector","view_debug","route_debug","data_debug"],
   function(Port, ObjectInspector, ViewDebug, RouteDebug, DataDebug) {

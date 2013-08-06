@@ -1,55 +1,125 @@
 var get = Ember.get;
 
 var DataAdapter = Ember.Object.extend({
+  init: function() {
+    this._super();
+    this.ModelClass = window.DS.Model;
+  },
+
   application: null,
 
+  countAttributes: 3,
+  ModelClass: null,
+
+  detect: function(klass) {
+    return klass !== this.ModelClass && this.ModelClass.detect(klass);
+  },
+
+  releaseModelTypes: function(target) {
+    var modelTypes = this.findModelTypes(), self = this;
+
+    modelTypes.forEach(function(type) {
+      var objectId = Ember.guidFor(type);
+      var records = self.findRecords(type);
+    });
+  },
+
+  columnsForType: function(type) {
+    var columns = [{ name: 'id' }], count = 0, self = this;
+    get(type, 'attributes').forEach(function(name, meta) {
+        if (count > self.countAttributes) { return false; }
+        columns.push({ name: name });
+        count++;
+    });
+    return columns;
+  },
+
+  getModelTypes: function(target, typesReceived, typeUpdated) {
+    var modelTypes = this.findModelTypes(), self = this, types;
+    types = modelTypes.map(function(type) {
+
+      var columns = self.columnsForType(type);
+
+      var records = self.findRecords(type);
+
+      var typeToSend = {
+        name: type.toString(),
+        count: get(records, 'length'),
+        columns: columns,
+        object: type
+      };
+
+      var callback = modelTypesDidChange(typeToSend, records);
+      var contentDidChange = function() { Ember.run.scheduleOnce('actions', this, callback); };
+
+      var observer = {
+        didChange: contentDidChange,
+        willChange: Ember.K
+      };
+
+      typeToSend.release = function() {
+        records.removeArrayObserver(self, observer);
+      };
+
+      records.addArrayObserver(self, observer);
+
+      return typeToSend;
+    });
+
+    typesReceived.call(target, types);
+
+    function modelTypesDidChange(typeToSend, records) {
+      return function() {
+        typeToSend.count = get(records, 'length');
+        typeUpdated.call(target, typeToSend);
+      };
+    }
+  },
+
   findModelTypes: function() {
-    var namespaces = Ember.Namespace.NAMESPACES;
-    var ModelTypes = [];
+    var namespaces = Ember.Namespace.NAMESPACES, types = [], self = this;
+
     namespaces.forEach(function(namespace) {
-      if (namespace === Ember || namespace === window.DS) {
-        return true;
-      }
+
+      if (namespace === Ember) { return true; }
+
       for (var key in namespace) {
-        var ModelType = namespace[key];
-        if (window.DS.Model.detect(ModelType)) {
-          ModelTypes.push(ModelType);
+        if (!namespace.hasOwnProperty(key)) { continue; }
+        var klass = namespace[key];
+        if (self.detect(klass)) {
+          types.push(klass);
         }
       }
     });
-    return ModelTypes;
+    return types;
   },
 
-
-  getCountRecords: function(ModelType) {
+  getCountRecords: function(type) {
     var store = this.get('application.__container__').lookup('store:main');
-    return store.all(ModelType).get('length');
+    return store.all(type).get('length');
   },
 
-
-
-  findRecords: function(typeName) {
-    var store = this.get('application.__container__').lookup('store:main');
-
-    var recordArray = store.all(get(Ember.lookup, typeName));
-    return recordArray.map(function(record) {
-      var obj = {
-        id: get(record, 'id')
-      };
-      record.eachAttribute(function(name) {
-        obj[name] = get(record, name);
+  getRecords: function(type, target, recordsReceived, recordAdded, recordUpdated, recordRemoved) {
+    var self = this;
+    var records = this.findRecords(type);
+    var recordsToSend = records.map(function(record) {
+      var count = 0;
+      var columnValues = {};
+      self.columnsForType(type).forEach(function(item) {
+        columnValues[item.name] = get(record, item.name);
       });
-      return obj;
+      return {
+        object: record,
+        columnValues: columnValues
+      };
     });
+    return recordsToSend;
   },
 
-
-
-  findRecord: function(typeName, id) {
+  findRecords: function(type) {
     var store = this.get('application.__container__').lookup('store:main');
-    return store.find(get(Ember.lookup, typeName), id);
+    return store.all(type);
   }
-
 
 });
 

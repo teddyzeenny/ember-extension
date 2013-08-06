@@ -2,34 +2,50 @@ import EmberExtension from "main";
 
 var port, message, name;
 
+function modelTypeFactory(options) {
+  return {
+    name: options.name,
+    count: options.count,
+    columns: options.columns,
+    objectId: options.name
+  };
+}
+
 function modelTypes() {
   return [
-    {
+    modelTypeFactory({
       name: 'App.Post',
       count: 2,
-      attributes: [ { name: 'id'}, { name: 'title' }, { name: 'body' } ]
-    },
-    {
+      columns: [ { name: 'id'}, { name: 'title' }, { name: 'body' } ]
+    }),
+    modelTypeFactory({
       name: 'App.Comment',
       count: 2,
-      attributes: [ { name: 'id'}, { name: 'title' }, { name: 'body' }]
-    }
+      columns: [ { name: 'id'}, { name: 'title' }, { name: 'body' }]
+    })
   ];
 }
 
-function records(modelType) {
-  if (modelType === 'App.Post') {
+function recordFactory(attr) {
+  var object = Ember.Object.create();
+  return {
+    columnValues: attr,
+    objectId: Ember.guidFor(object)
+  };
+}
+
+function records(type) {
+  if (type === 'App.Post') {
     return [
-      { id: 1, title: 'My Post', body: 'This is my first post' },
-      { id: 2, title: 'Hello', body: '' }
+      recordFactory({ id: 1, title: 'My Post', body: 'This is my first post' }),
+      recordFactory({ id: 2, title: 'Hello', body: '' })
     ];
-  } else if(modelType === 'App.Comment') {
+  } else if(type === 'App.Comment') {
     return [
-      { id: 1, title: 'My Comment', body: 'This is my comment' },
-      { id: 2, title: 'I am confused', body: 'I have no idea what im doing' }
+      recordFactory({ id: 1, title: 'My Comment', body: 'This is my comment' }),
+      recordFactory({ id: 2, title: 'I am confused', body: 'I have no idea what im doing' })
     ];
   }
-
 }
 
 module("Data", {
@@ -56,7 +72,7 @@ test("Model types are successfully listed", function() {
         this.trigger('data:modelTypes', { modelTypes: modelTypes() });
       }
       if (name === 'data:getRecords') {
-        this.trigger('data:records', { records: records(message.modelType ) });
+        this.trigger('data:records', { records: records(message.objectId) });
       }
     }
   });

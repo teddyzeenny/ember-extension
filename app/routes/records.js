@@ -12,7 +12,7 @@ var RecordsRoute = Ember.Route.extend({
 
   events: {
     inspectModel: function(model) {
-      this.get('port').send('data:inspectModel', { modelType: this.modelFor('model_type').name, id: Ember.get(model, 'id') });
+      this.get('port').send('data:inspectModel', { objectId: Ember.get(model, 'objectId') });
     }
   }
 });
@@ -22,7 +22,7 @@ function findRecords(type, port) {
     port.one('data:records', function(message) {
       resolve(message.records);
     });
-    port.send('data:getRecords', { modelType: type.name });
+    port.send('data:getRecords', { objectId: type.objectId });
   });
 }
 

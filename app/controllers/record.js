@@ -1,13 +1,13 @@
 var RecordController = Ember.ObjectController.extend({
 
-  modelTypeAttributes: Ember.computed.alias('target.target.attributes'),
+  modelTypeColumns: Ember.computed.alias('target.target.columns'),
 
-  attributes: function() {
+  columns: function() {
     var self = this;
-    return this.get('modelTypeAttributes').map(function(attr) {
-      return { name: attr.name, value: self.get(attr.name) };
+    return this.get('modelTypeColumns').map(function(col) {
+      return { name: col.name, value: self.get('columnValues.' + col.name) };
     });
-  }.property('modelTypeAttributes.@each', 'model')
+  }.property('modelTypeColumns.@each', 'model.columnValues')
 });
 
 export default RecordController;

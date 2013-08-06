@@ -7,8 +7,15 @@ var classify = Ember.String.classify, get = Ember.get;
 var DataDebug = Ember.Object.extend(PortMixin, {
   init: function() {
     this._super();
-    this.adapter = DataAdapter.create({ application: this.get('application') });
+    this.sentTypes = {};
+    this.sentRecords = {};
+    if(window.DS) {
+      this.adapter = DataAdapter.create({ application: this.get('application') });
+    }
   },
+
+  sentTypes: {},
+  sentRecords: {},
 
   adapter: null,
 
@@ -20,44 +27,74 @@ var DataDebug = Ember.Object.extend(PortMixin, {
 
   portNamespace: 'data',
 
-
-  // THIS WILL BE PULLED INTO AN ADAPTER ==============
-
-  getModelTypes: function() {
-    var modelTypes = this.adapter.findModelTypes(), self = this;
-    return modelTypes.map(function(ModelType) {
-      var attributes = [ { name: 'id' } ];
-      get(ModelType, 'attributes').forEach(function(name, meta) {
-        attributes.push({ name: name });
-      });
-      return {
-        name: ModelType.toString(),
-        count: self.adapter.getCountRecords(ModelType),
-        attributes: attributes
-      };
+  modelTypesReceived: function(types) {
+    var self = this, objectId, typesToSend;
+    typesToSend = types.map(function(type) {
+      objectId = Ember.guidFor(type);
+      return self.wrapType(type);
+    });
+    this.sendMessage('modelTypes', {
+      modelTypes: typesToSend
     });
   },
 
+  modelTypeUpdated: function(type) {
+    var objectId = Ember.guidFor(type);
+    this.sendMessage('modelTypeUpdated', {
+      modelType: this.wrapType(type)
+    });
+  },
 
-  //==================================================
+  wrapType: function(type) {
+    var objectId = Ember.guidFor(type);
+    this.sentTypes[objectId] = type;
+
+    return {
+      columns: type.columns,
+      count: type.count,
+      name: type.name,
+      objectId: objectId
+    };
+  },
+
+  reset: function() {
+    var type;
+    for (var i in this.sentTypes) {
+      type = this.sentTypes[i];
+      type.release();
+    }
+  },
 
   messages: {
     getModelTypes: function() {
-      this.sendMessage('modelTypes', {
-        modelTypes: this.getModelTypes()
-      });
+      this.adapter.getModelTypes(this, this.modelTypesReceived, this.modelTypeUpdated);
+    },
+
+    clearTypes: function() {
+      this.sentTypes = {};
+    },
+
+    reset: function() {
+      this.reset();
     },
 
     getRecords: function(message) {
-      var records = this.adapter.findRecords(message.modelType);
+      var type = this.sentTypes[message.objectId], self = this, records;
+      records = this.adapter.getRecords(type.object).map(function(record) {
+        var objectId = Ember.guidFor(record.object);
+        self.sentRecords[objectId] = record;
+        return {
+          columnValues: record.columnValues,
+          objectId: objectId
+        };
+      });
       this.sendMessage('records', {
         records: records
       });
     },
 
     inspectModel: function(message) {
-      var record = this.adapter.findRecord(message.modelType, message.id);
-      this.get('objectInspector').sendObject(record);
+      this.get('objectInspector').sendObject(this.sentRecords[message.objectId].object);
     }
   }
 });

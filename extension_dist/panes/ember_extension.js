@@ -289,14 +289,14 @@ define("controllers/record",
     "use strict";
     var RecordController = Ember.ObjectController.extend({
 
-      modelTypeAttributes: Ember.computed.alias('target.target.attributes'),
+      modelTypeColumns: Ember.computed.alias('target.target.columns'),
 
-      attributes: function() {
+      columns: function() {
         var self = this;
-        return this.get('modelTypeAttributes').map(function(attr) {
-          return { name: attr.name, value: self.get(attr.name) };
+        return this.get('modelTypeColumns').map(function(col) {
+          return { name: col.name, value: self.get('columnValues.' + col.name) };
         });
-      }.property('modelTypeAttributes.@each', 'model')
+      }.property('modelTypeColumns.@each', 'model.columnValues')
     });
 
 
@@ -307,15 +307,7 @@ define("controllers/records",
   function() {
     "use strict";
     var RecordsController = Ember.ArrayController.extend({
-      attributes: function() {
-        var attributes = [], count = 0;
-        this.get('modelType.attributes').forEach(function(item) {
-          if (count > 3) { return false; }
-          attributes.push(item);
-          count++;
-        });
-        return attributes;
-      }.property('modelType')
+      columns: Ember.computed.alias('modelType.columns')
     });
 
 
@@ -658,15 +650,25 @@ define("routes/model_types",
     "use strict";
     var Promise = Ember.RSVP.Promise;
 
-    var DataIndexRoute = Ember.Route.extend({
+    var ModelTypesRoute = Ember.Route.extend({
       model: function() {
         var self = this;
         return new Promise(function(resolve) {
           self.get('port').one('data:modelTypes', function(message) {
             resolve(message.modelTypes);
           });
+          self.get('port').on('data:modelTypeUpdated', self, self.updateModelType);
           self.get('port').send('data:getModelTypes');
         });
+      },
+
+      deactivate: function() {
+        this.get('port').off('data:modelTypeUpdated', this, this.updateModelType);
+      },
+
+      updateModelType: function(message) {
+        var currentType = this.get('currentModel').findProperty('objectId', message.modelType.objectId);
+        Ember.set(currentType, 'count', message.modelType.count);
       },
 
       events: {
@@ -677,7 +679,7 @@ define("routes/model_types",
     });
 
 
-    return DataIndexRoute;
+    return ModelTypesRoute;
   });
 define("routes/records",
   [],
@@ -697,7 +699,7 @@ define("routes/records",
 
       events: {
         inspectModel: function(model) {
-          this.get('port').send('data:inspectModel', { modelType: this.modelFor('model_type').name, id: Ember.get(model, 'id') });
+          this.get('port').send('data:inspectModel', { objectId: Ember.get(model, 'objectId') });
         }
       }
     });
@@ -707,7 +709,7 @@ define("routes/records",
         port.one('data:records', function(message) {
           resolve(message.records);
         });
-        port.send('data:getRecords', { modelType: type.name });
+        port.send('data:getRecords', { objectId: type.objectId });
       });
     }
 
@@ -1446,7 +1448,7 @@ function program3(depth0,data) {
   data.buffer.push(">\n            ");
   hashTypes = {};
   hashContexts = {};
-  stack1 = helpers.each.call(depth0, "attributes", {hash:{},inverse:self.noop,fn:self.program(4, program4, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  stack1 = helpers.each.call(depth0, "columns", {hash:{},inverse:self.noop,fn:self.program(4, program4, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n          </tr>\n        ");
   return buffer;
@@ -1465,7 +1467,7 @@ function program4(depth0,data) {
   data.buffer.push("<div class=\"table-tree\">\n  <div class=\"table-tree__table-container\">\n    <table cellspacing=\"0\" border-collapse=\"collapse\">\n      <thead>\n        <tr>\n          ");
   hashTypes = {};
   hashContexts = {};
-  stack1 = helpers.each.call(depth0, "attributes", {hash:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  stack1 = helpers.each.call(depth0, "columns", {hash:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        </tr>\n      </thead>\n      <tbody>\n        ");
   hashContexts = {'itemController': depth0};

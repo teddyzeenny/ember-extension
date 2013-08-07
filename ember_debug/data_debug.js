@@ -58,10 +58,9 @@ var DataDebug = Ember.Object.extend(PortMixin, {
   },
 
   reset: function() {
-    var type;
     for (var i in this.sentTypes) {
-      type = this.sentTypes[i];
-      type.release();
+      this.sentTypes[i].release();
+      delete this.sentTypes[i];
     }
   },
 
@@ -80,17 +79,20 @@ var DataDebug = Ember.Object.extend(PortMixin, {
 
     getRecords: function(message) {
       var type = this.sentTypes[message.objectId], self = this, records;
-      records = this.adapter.getRecords(type.object).map(function(record) {
-        var objectId = Ember.guidFor(record.object);
-        self.sentRecords[objectId] = record;
-        return {
-          columnValues: record.columnValues,
-          objectId: objectId
-        };
+      this.adapter.getRecords(type.object).records.then(function(recordsReceived) {
+        records = recordsReceived.map(function(record) {
+          var objectId = Ember.guidFor(record.object);
+          self.sentRecords[objectId] = record;
+          return {
+            columnValues: record.columnValues,
+            objectId: objectId
+          };
+        });
+        self.sendMessage('records', {
+          records: records
+        });
       });
-      this.sendMessage('records', {
-        records: records
-      });
+
     },
 
     inspectModel: function(message) {

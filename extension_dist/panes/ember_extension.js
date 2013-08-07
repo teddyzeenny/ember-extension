@@ -307,7 +307,35 @@ define("controllers/records",
   function() {
     "use strict";
     var RecordsController = Ember.ArrayController.extend({
-      columns: Ember.computed.alias('modelType.columns')
+      columns: Ember.computed.alias('modelType.columns'),
+
+      search: '',
+
+      modelChanged: function() {
+        this.set('search', '');
+      }.observes('model'),
+
+      recordToString: function(record) {
+        var columnValues = Ember.get(record, 'columnValues');
+        var search = '';
+        for(var i in columnValues) {
+          search += ' ' + columnValues[i];
+        }
+        return search.toLowerCase();
+      },
+
+      filtered: function() {
+        var self = this, search = this.get('search');
+        if (Ember.isEmpty(search)) {
+          return this.get('model');
+        }
+        return this.get('model').filter(function(item) {
+          var searchString = self.recordToString(item);
+          return !!searchString.toLowerCase().match(new RegExp('.*' + search + '.*'));
+        });
+      }.property('search', 'model.columnValues')
+
+
     });
 
 
@@ -1425,7 +1453,7 @@ function program4(depth0,data) {
 this["Ember"]["TEMPLATES"]["records"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [3,'>= 1.0.0-rc.4'];
 helpers = helpers || Ember.Handlebars.helpers; data = data || {};
-  var buffer = '', stack1, hashTypes, hashContexts, escapeExpression=this.escapeExpression, self=this;
+  var buffer = '', stack1, hashTypes, hashContexts, options, escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing;
 
 function program1(depth0,data) {
   
@@ -1464,7 +1492,7 @@ function program4(depth0,data) {
   return buffer;
   }
 
-  data.buffer.push("<div class=\"table-tree\">\n  <div class=\"table-tree__table-container\">\n    <table cellspacing=\"0\" border-collapse=\"collapse\">\n      <thead>\n        <tr>\n          ");
+  data.buffer.push("<div class=\"table-tree table-tree_type_advanced\">\n  <div class=\"table-tree__table-container\">\n    <table cellspacing=\"0\" border-collapse=\"collapse\">\n      <thead>\n        <tr>\n          ");
   hashTypes = {};
   hashContexts = {};
   stack1 = helpers.each.call(depth0, "columns", {hash:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
@@ -1472,11 +1500,19 @@ function program4(depth0,data) {
   data.buffer.push("\n        </tr>\n      </thead>\n      <tbody>\n        ");
   hashContexts = {'itemController': depth0};
   hashTypes = {'itemController': "STRING"};
-  stack1 = helpers.each.call(depth0, "model", {hash:{
+  stack1 = helpers.each.call(depth0, "filtered", {hash:{
     'itemController': ("record")
   },inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n      </tbody>\n    </table>\n  </div>\n</div>\n");
+  data.buffer.push("\n      </tbody>\n    </table>\n  </div>\n\n  <div class=\"table-tree__filter\">\n    ");
+  hashContexts = {'value': depth0,'placeholder': depth0};
+  hashTypes = {'value': "ID",'placeholder': "STRING"};
+  options = {hash:{
+    'value': ("search"),
+    'placeholder': ("Search")
+  },contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
+  data.buffer.push(escapeExpression(((stack1 = helpers.input),stack1 ? stack1.call(depth0, options) : helperMissing.call(depth0, "input", options))));
+  data.buffer.push("\n  </div>\n\n</div>\n");
   return buffer;
   
 });

@@ -115,7 +115,7 @@ define("data_adapter",
   [],
   function() {
     "use strict";
-    var get = Ember.get;
+    var get = Ember.get, RSVP = Ember.RSVP;
 
     var DataAdapter = Ember.Object.extend({
       init: function() {
@@ -169,14 +169,8 @@ define("data_adapter",
           var callback = modelTypesDidChange(typeToSend, records);
           var contentDidChange = function() { Ember.run.scheduleOnce('actions', this, callback); };
 
-          var observer = {
-            didChange: contentDidChange,
-            willChange: Ember.K
-          };
-
-          typeToSend.release = function() {
-            records.removeArrayObserver(self, observer);
-          };
+          var observer = { didChange: contentDidChange, willChange: Ember.K };
+          typeToSend.release = function() { records.removeArrayObserver(self, observer); };
 
           records.addArrayObserver(self, observer);
 
@@ -216,7 +210,7 @@ define("data_adapter",
         return store.all(type).get('length');
       },
 
-      getRecords: function(type, target, recordsReceived, recordAdded, recordUpdated, recordRemoved) {
+      getRecords: function(type, recordsReceived, recordAdded, recordUpdated, recordRemoved) {
         var self = this;
         var records = this.findRecords(type);
         var recordsToSend = records.map(function(record) {
@@ -230,7 +224,13 @@ define("data_adapter",
             columnValues: columnValues
           };
         });
-        return recordsToSend;
+
+        var releaseMethod = function() {};
+
+        return {
+          records: RSVP.resolve(recordsToSend),
+          release: releaseMethod
+        };
       },
 
       findRecords: function(type) {
@@ -305,10 +305,9 @@ define("data_debug",
       },
 
       reset: function() {
-        var type;
         for (var i in this.sentTypes) {
-          type = this.sentTypes[i];
-          type.release();
+          this.sentTypes[i].release();
+          delete this.sentTypes[i];
         }
       },
 
@@ -327,17 +326,20 @@ define("data_debug",
 
         getRecords: function(message) {
           var type = this.sentTypes[message.objectId], self = this, records;
-          records = this.adapter.getRecords(type.object).map(function(record) {
-            var objectId = Ember.guidFor(record.object);
-            self.sentRecords[objectId] = record;
-            return {
-              columnValues: record.columnValues,
-              objectId: objectId
-            };
+          this.adapter.getRecords(type.object).records.then(function(recordsReceived) {
+            records = recordsReceived.map(function(record) {
+              var objectId = Ember.guidFor(record.object);
+              self.sentRecords[objectId] = record;
+              return {
+                columnValues: record.columnValues,
+                objectId: objectId
+              };
+            });
+            self.sendMessage('records', {
+              records: records
+            });
           });
-          this.sendMessage('records', {
-            records: records
-          });
+
         },
 
         inspectModel: function(message) {

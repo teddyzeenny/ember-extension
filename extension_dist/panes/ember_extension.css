@@ -145,6 +145,7 @@ a {
   height: 100%;
 }
 
+
 /**
  MAIN-NAV
  ========
@@ -568,6 +569,7 @@ a {
 }
 
 
+
 /* MODIFIER: state = collapsed */
 .table-tree_state_collapsed {
   float: none;
@@ -578,9 +580,27 @@ a {
   float: none;
 }
 
-
 .table-tree__row_selected td {
   color: #939;;
+}
+
+
+/* MODIFIER: type = advanced */
+
+.table-tree_type_advanced {
+  display: -webkit-flex;
+  -webkit-flex-direction: column;
+}
+
+.table-tree_type_advanced  .table-tree__table-container {
+  height: auto;
+  -webkit-flex: 1;
+}
+
+.table-tree_type_advanced  .table-tree__filter {
+  height: 30px;
+  background-color: #d6dde5;
+  border-top: solid 1px gray;
 }
 
 /**

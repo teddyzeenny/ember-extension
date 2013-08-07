@@ -1,4 +1,4 @@
-var get = Ember.get;
+var get = Ember.get, RSVP = Ember.RSVP;
 
 var DataAdapter = Ember.Object.extend({
   init: function() {
@@ -52,14 +52,8 @@ var DataAdapter = Ember.Object.extend({
       var callback = modelTypesDidChange(typeToSend, records);
       var contentDidChange = function() { Ember.run.scheduleOnce('actions', this, callback); };
 
-      var observer = {
-        didChange: contentDidChange,
-        willChange: Ember.K
-      };
-
-      typeToSend.release = function() {
-        records.removeArrayObserver(self, observer);
-      };
+      var observer = { didChange: contentDidChange, willChange: Ember.K };
+      typeToSend.release = function() { records.removeArrayObserver(self, observer); };
 
       records.addArrayObserver(self, observer);
 
@@ -99,7 +93,7 @@ var DataAdapter = Ember.Object.extend({
     return store.all(type).get('length');
   },
 
-  getRecords: function(type, target, recordsReceived, recordAdded, recordUpdated, recordRemoved) {
+  getRecords: function(type, recordsReceived, recordAdded, recordUpdated, recordRemoved) {
     var self = this;
     var records = this.findRecords(type);
     var recordsToSend = records.map(function(record) {
@@ -113,7 +107,13 @@ var DataAdapter = Ember.Object.extend({
         columnValues: columnValues
       };
     });
-    return recordsToSend;
+
+    var releaseMethod = function() {};
+
+    return {
+      records: RSVP.resolve(recordsToSend),
+      release: releaseMethod
+    };
   },
 
   findRecords: function(type) {

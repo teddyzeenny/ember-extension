@@ -679,24 +679,33 @@ define("routes/model_types",
     var Promise = Ember.RSVP.Promise;
 
     var ModelTypesRoute = Ember.Route.extend({
+      setupController: function(controller, model) {
+        this._super(controller, model);
+        this.get('port').one('data:modelTypesAdded', this, this.addModelTypes);
+        this.get('port').on('data:modelTypesUpdated', this, this.updateModelTypes);
+        this.get('port').send('data:getModelTypes');
+      },
+
       model: function() {
-        var self = this;
-        return new Promise(function(resolve) {
-          self.get('port').one('data:modelTypes', function(message) {
-            resolve(message.modelTypes);
-          });
-          self.get('port').on('data:modelTypeUpdated', self, self.updateModelType);
-          self.get('port').send('data:getModelTypes');
-        });
+        return [];
       },
 
       deactivate: function() {
-        this.get('port').off('data:modelTypeUpdated', this, this.updateModelType);
+        this.get('port').off('data:modelTypesUpdated', this, this.updateModelType);
+        this.get('port').off('data:modelTypesAdded', this, this.updateModelType);
+        this.get('port').send('data:releaseModelTypes');
       },
 
-      updateModelType: function(message) {
-        var currentType = this.get('currentModel').findProperty('objectId', message.modelType.objectId);
-        Ember.set(currentType, 'count', message.modelType.count);
+      addModelTypes: function(message) {
+        this.get('currentModel').pushObjects(message.modelTypes);
+      },
+
+      updateModelTypes: function(message) {
+        var self = this;
+        message.modelTypes.forEach(function(modelType) {
+          var currentType = self.get('currentModel').findProperty('objectId', modelType.objectId);
+          Ember.set(currentType, 'count', modelType.count);
+        });
       },
 
       events: {
@@ -718,11 +727,33 @@ define("routes/records",
     var RecordsRoute = Ember.Route.extend({
       setupController: function(controller, model) {
         this._super(controller, model);
+
+        var type = this.modelFor('model_type');
+
         controller.set('modelType', this.modelFor('model_type'));
+
+        this.get('port').on('data:recordsAdded', this, this.addRecords);
+        this.get('port').on('data:recordUpdated', this, this.updateRecord);
+        this.get('port').on('data:recordsRemoved', this, this.removeRecords);
+        this.get('port').send('data:getRecords', { objectId: type.objectId });
       },
+
       model: function() {
-        var self = this, type = this.modelFor('model_type');
-        return findRecords(type, this.get('port'));
+        return [];
+      },
+
+
+      updateRecord: function(message) {
+        var currentRecord = this.get('currentModel').findProperty('objectId', message.record.objectId);
+        Ember.set(currentRecord, 'columnValues', message.record.columnValues);
+      },
+
+      addRecords: function(message) {
+        this.get('currentModel').pushObjects(message.records);
+      },
+
+      removeRecords: function(message) {
+        this.get('currentModel').removeAt(message.index, message.count);
       },
 
       events: {
@@ -731,15 +762,6 @@ define("routes/records",
         }
       }
     });
-
-    function findRecords(type, port) {
-      return new Promise(function(resolve) {
-        port.one('data:records', function(message) {
-          resolve(message.records);
-        });
-        port.send('data:getRecords', { objectId: type.objectId });
-      });
-    }
 
 
     return RecordsRoute;

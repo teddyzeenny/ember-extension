@@ -1,24 +1,33 @@
 var Promise = Ember.RSVP.Promise;
 
 var ModelTypesRoute = Ember.Route.extend({
+  setupController: function(controller, model) {
+    this._super(controller, model);
+    this.get('port').one('data:modelTypesAdded', this, this.addModelTypes);
+    this.get('port').on('data:modelTypesUpdated', this, this.updateModelTypes);
+    this.get('port').send('data:getModelTypes');
+  },
+
   model: function() {
-    var self = this;
-    return new Promise(function(resolve) {
-      self.get('port').one('data:modelTypes', function(message) {
-        resolve(message.modelTypes);
-      });
-      self.get('port').on('data:modelTypeUpdated', self, self.updateModelType);
-      self.get('port').send('data:getModelTypes');
-    });
+    return [];
   },
 
   deactivate: function() {
-    this.get('port').off('data:modelTypeUpdated', this, this.updateModelType);
+    this.get('port').off('data:modelTypesUpdated', this, this.updateModelType);
+    this.get('port').off('data:modelTypesAdded', this, this.updateModelType);
+    this.get('port').send('data:releaseModelTypes');
   },
 
-  updateModelType: function(message) {
-    var currentType = this.get('currentModel').findProperty('objectId', message.modelType.objectId);
-    Ember.set(currentType, 'count', message.modelType.count);
+  addModelTypes: function(message) {
+    this.get('currentModel').pushObjects(message.modelTypes);
+  },
+
+  updateModelTypes: function(message) {
+    var self = this;
+    message.modelTypes.forEach(function(modelType) {
+      var currentType = self.get('currentModel').findProperty('objectId', modelType.objectId);
+      Ember.set(currentType, 'count', modelType.count);
+    });
   },
 
   events: {

@@ -3,11 +3,33 @@ var Promise = Ember.RSVP.Promise;
 var RecordsRoute = Ember.Route.extend({
   setupController: function(controller, model) {
     this._super(controller, model);
+
+    var type = this.modelFor('model_type');
+
     controller.set('modelType', this.modelFor('model_type'));
+
+    this.get('port').on('data:recordsAdded', this, this.addRecords);
+    this.get('port').on('data:recordUpdated', this, this.updateRecord);
+    this.get('port').on('data:recordsRemoved', this, this.removeRecords);
+    this.get('port').send('data:getRecords', { objectId: type.objectId });
   },
+
   model: function() {
-    var self = this, type = this.modelFor('model_type');
-    return findRecords(type, this.get('port'));
+    return [];
+  },
+
+
+  updateRecord: function(message) {
+    var currentRecord = this.get('currentModel').findProperty('objectId', message.record.objectId);
+    Ember.set(currentRecord, 'columnValues', message.record.columnValues);
+  },
+
+  addRecords: function(message) {
+    this.get('currentModel').pushObjects(message.records);
+  },
+
+  removeRecords: function(message) {
+    this.get('currentModel').removeAt(message.index, message.count);
   },
 
   events: {
@@ -16,14 +38,5 @@ var RecordsRoute = Ember.Route.extend({
     }
   }
 });
-
-function findRecords(type, port) {
-  return new Promise(function(resolve) {
-    port.one('data:records', function(message) {
-      resolve(message.records);
-    });
-    port.send('data:getRecords', { objectId: type.objectId });
-  });
-}
 
 export default RecordsRoute;

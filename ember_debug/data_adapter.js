@@ -1,27 +1,16 @@
-var get = Ember.get, RSVP = Ember.RSVP;
+var get = Ember.get, RSVP = Ember.RSVP, DS = window.DS;
 
 var DataAdapter = Ember.Object.extend({
   init: function() {
     this._super();
-    this.ModelClass = window.DS.Model;
   },
 
   application: null,
 
   countAttributes: 3,
-  ModelClass: null,
 
   detect: function(klass) {
-    return klass !== this.ModelClass && this.ModelClass.detect(klass);
-  },
-
-  releaseModelTypes: function(target) {
-    var modelTypes = this.findModelTypes(), self = this;
-
-    modelTypes.forEach(function(type) {
-      var objectId = Ember.guidFor(type);
-      var records = self.findRecords(type);
-    });
+    return klass !== DS.Model && DS.Model.detect(klass);
   },
 
   columnsForType: function(type) {
@@ -34,8 +23,9 @@ var DataAdapter = Ember.Object.extend({
     return columns;
   },
 
-  getModelTypes: function(target, typesReceived, typeUpdated) {
-    var modelTypes = this.findModelTypes(), self = this, types;
+  getModelTypes: function(typesAdded, typesUpdated) {
+    var modelTypes = this.findModelTypes(),
+        self = this, types, arrayObservers = [];
     types = modelTypes.map(function(type) {
 
       var columns = self.columnsForType(type);
@@ -53,21 +43,33 @@ var DataAdapter = Ember.Object.extend({
       var contentDidChange = function() { Ember.run.scheduleOnce('actions', this, callback); };
 
       var observer = { didChange: contentDidChange, willChange: Ember.K };
-      typeToSend.release = function() { records.removeArrayObserver(self, observer); };
+      arrayObservers.push({
+        array: records,
+        target: self,
+        handle: observer
+      });
 
       records.addArrayObserver(self, observer);
 
       return typeToSend;
     });
 
-    typesReceived.call(target, types);
+    typesAdded(types);
+
+    var release = function() {
+      arrayObservers.forEach(function(observer) {
+        observer.array.removeArrayObserver(observer.target, observer.handle);
+      });
+    };
 
     function modelTypesDidChange(typeToSend, records) {
       return function() {
         typeToSend.count = get(records, 'length');
-        typeUpdated.call(target, typeToSend);
+        typesUpdated([typeToSend]);
       };
     }
+
+    return release;
   },
 
   findModelTypes: function() {
@@ -93,27 +95,57 @@ var DataAdapter = Ember.Object.extend({
     return store.all(type).get('length');
   },
 
-  getRecords: function(type, recordsReceived, recordAdded, recordUpdated, recordRemoved) {
+  getRecords: function(type, recordsAdded, recordsUpdated, recordsRemoved) {
     var self = this;
+    var observers = [];
     var records = this.findRecords(type);
     var recordsToSend = records.map(function(record) {
-      var count = 0;
-      var columnValues = {};
-      self.columnsForType(type).forEach(function(item) {
-        columnValues[item.name] = get(record, item.name);
-      });
-      return {
-        object: record,
-        columnValues: columnValues
-      };
+      var recordToSend = self.wrapRecord(type, record, recordsUpdated, observers);
+      return recordToSend;
     });
+
+    recordsAdded(recordsToSend);
+
+    var contentDidChange = function(array, idx, removedCount, addedCount) {
+      for (var i = idx; i < idx + addedCount; i++) {
+        var record = array.objectAt(i);
+        var r = self.wrapRecord(type, record, recordsUpdated, observers);
+        recordsAdded([r]);
+      }
+
+      if (removedCount) {
+        recordsRemoved(idx, removedCount);
+      }
+    };
+
+    var observer = { didChange: contentDidChange, willChange: Ember.K };
+    records.addArrayObserver(self, observer);
 
     var releaseMethod = function() {};
 
-    return {
-      records: RSVP.resolve(recordsToSend),
-      release: releaseMethod
-    };
+    return releaseMethod;
+  },
+
+  wrapRecord: function(type, record, recordsUpdated, observers) {
+    var self = this;
+    var recordToSend = { object: record };
+    var columnValues = {};
+    self.columnsForType(type).forEach(function(item) {
+      columnValues[item.name] = get(record, item.name);
+      var handler = function() {
+        recordToSend.columnValues[item.name] = get(record, item.name);
+        recordsUpdated([recordToSend]);
+      };
+      Ember.addObserver(record, item.name, handler);
+      observers.push({
+        obj: record,
+        prop: item.name,
+        handler: handler
+      });
+    });
+
+    recordToSend.columnValues = columnValues;
+    return recordToSend;
   },
 
   findRecords: function(type) {

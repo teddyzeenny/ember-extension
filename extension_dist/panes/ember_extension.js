@@ -484,7 +484,7 @@ define("controllers/view_tree",
   function() {
     "use strict";
     var ViewTreeController = Ember.ObjectController.extend({
-      pinnedNode: null,
+      pinnedObjectId: null,
       inspectingViews: false,
 
       options: {
@@ -521,9 +521,14 @@ define("controllers/view_tree_item",
   function() {
     "use strict";
     var ViewTreeItemController = Ember.ObjectController.extend({
-      hasView: function() {
-        return this.get('model.value.viewClass') !== 'virtual';
-      }.property('model.value.viewClass'),
+      needs: ['viewTree'],
+
+      hasView: Ember.computed.not('model.value.isVirtual'),
+      hasElement: Ember.computed.not('model.value.isVirtual'),
+
+      isCurrent: function() {
+        return this.get('controllers.viewTree.pinnedObjectId') === this.get('model.value.objectId');
+      }.property('controllers.viewTree.pinnedObjectId', 'model.value.objectId'),
 
       hasController: function() {
         return !!this.get('model.value.controller');
@@ -534,7 +539,7 @@ define("controllers/view_tree_item",
       }.property('model.value.model'),
 
       style: function() {
-        return 'padding-left: ' + ((this.get('numParents') * 5) + 5) + 'px';
+        return 'padding-left: ' + ((this.get('numParents') * 10) + 5) + 'px';
       }.property('numParents'),
 
       numParents: function() {
@@ -543,7 +548,24 @@ define("controllers/view_tree_item",
           numParents = -1;
         }
         return numParents + 1;
-      }.property("target.target.numParents")
+      }.property("target.target.numParents"),
+
+      actions: {
+        inspectView: function() {
+          if (this.get('hasView')) {
+            this.get('target').send('inspect', this.get('value.objectId'));
+          }
+        },
+        inspectElement: function(objectId) {
+          if (!objectId && this.get('hasElement')) {
+            objectId = this.get('value.objectId');
+          }
+
+          if (objectId) {
+            this.get('target').send('inspectElement', objectId);
+          }
+        }
+      }
 
     });
 
@@ -942,6 +964,8 @@ define("routes/view_tree",
         this.get('port').on('view:viewTree', this, this.setViewTree);
         this.get('port').on('view:stopInspecting', this, this.stopInspecting);
         this.get('port').on('view:startInspecting', this, this.startInspecting);
+        this.get('port').on('view:pinView', this, this.pinView);
+        this.get('port').on('view:unpinView', this, this.unpinView);
         this.get('port').send('view:getTree');
       },
 
@@ -949,6 +973,8 @@ define("routes/view_tree",
         this.get('port').off('view:viewTree', this, this.setViewTree);
         this.get('port').off('view:stopInspecting', this, this.stopInspecting);
         this.get('port').off('view:startInspecting', this, this.startInspecting);
+        this.get('port').off('view:pinView', this, this.pinView);
+        this.get('port').off('view:unpinView', this, this.unpinView);
       },
 
       setViewTree: function(options) {
@@ -961,6 +987,14 @@ define("routes/view_tree",
 
       stopInspecting: function() {
         this.set('controller.inspectingViews', false);
+      },
+
+      pinView: function(message) {
+        this.set('controller.pinnedObjectId', message.objectId);
+      },
+
+      unpinView: function() {
+        this.set('controller.pinnedObjectId', null);
       },
 
       actions: {
@@ -989,16 +1023,6 @@ define("routes/view_tree",
   });
 this["Ember"] = this["Ember"] || {};
 this["Ember"]["TEMPLATES"] = this["Ember"]["TEMPLATES"] || {};
-
-this["Ember"]["TEMPLATES"]["_not_detected"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
-this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
-  
-
-
-  data.buffer.push("<div class=\"error-page\">\n\n  <div class=\"error-page__content\">\n\n    <div class=\"error-page__header\">\n      <div class=\"error-page__title\">Ember application not detected!</div>\n    </div>\n\n    <div class=\"error-page__reasons\">\n\n      <div class=\"error-page__reasons-title\">Here are some common reasons this happens:</div>\n\n      <ul class=\"error-page__list\">\n        <li>This is not an Ember application.</li>\n        <li>Your application is inside an iframe.</li>\n        <li>You are using an old version of Ember (&lt; rc5).</li>\n        <li>You are using the file:// protocol (instead of http://), in which case:\n          <ul>\n            <li>Visit the URL: chrome://extensions.</li>\n            <li>Find the Ember Inspector.</li>\n            <li>Make sure \"Allow access to file URLs\" is checked.</li>\n          </ul>\n        </li>\n      </ul>\n\n      If you're still having trouble, please file an issue on the Ember Inspector's\n      <a href=\"https://github.com/tildeio/ember-extension\" target=\"_blank\">GitHub page.</a>\n    </div>\n\n  </div>\n\n</div>\n");
-  
-});
 
 this["Ember"]["TEMPLATES"]["_route_node"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
@@ -1121,13 +1145,13 @@ function program2(depth0,data) {
   hashContexts = {'class': depth0,'style': depth0};
   hashTypes = {'class': "STRING",'style': "ID"};
   data.buffer.push(escapeExpression(helpers.bindAttr.call(depth0, {hash:{
-    'class': (":table-tree__main-cell :table-tree__clickable"),
+    'class': (":table-tree__main-cell hasElement:table-tree__clickable isCurrent:table-tree__main-cell_state_current"),
     'style': ("style")
   },contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
   data.buffer.push(" ");
   hashTypes = {};
   hashContexts = {};
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "inspectElement", "value.objectId", {hash:{},contexts:[depth0,depth0],types:["STRING","ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "inspectElement", {hash:{},contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
   data.buffer.push(">\n      ");
   hashTypes = {};
   hashContexts = {};
@@ -1135,7 +1159,7 @@ function program2(depth0,data) {
   data.buffer.push("\n    </td>\n     <td ");
   hashTypes = {};
   hashContexts = {};
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "inspect", "value.objectId", {hash:{},contexts:[depth0,depth0],types:["STRING","ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "inspectView", {hash:{},contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
   data.buffer.push(" ");
   hashContexts = {'class': depth0};
   hashTypes = {'class': "STRING"};
@@ -1145,11 +1169,12 @@ function program2(depth0,data) {
   data.buffer.push(">\n      ");
   hashTypes = {};
   hashContexts = {};
-  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "value.viewClass", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  stack1 = helpers.unless.call(depth0, "value.isVirtual", {hash:{},inverse:self.program(5, program5, data),fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n      ");
   hashTypes = {};
   hashContexts = {};
-  stack1 = helpers['if'].call(depth0, "value.isComponent", {hash:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  stack1 = helpers['if'].call(depth0, "value.isComponent", {hash:{},inverse:self.noop,fn:self.program(7, program7, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n    </td>\n    <td ");
   hashTypes = {};
@@ -1184,8 +1209,25 @@ function program2(depth0,data) {
   }
 function program3(depth0,data) {
   
+  var buffer = '', hashTypes, hashContexts;
+  data.buffer.push("\n        ");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "value.viewClass", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n      ");
+  return buffer;
+  }
+
+function program5(depth0,data) {
   
-  data.buffer.push("\n        (component)\n      ");
+  
+  data.buffer.push("\n        --\n      ");
+  }
+
+function program7(depth0,data) {
+  
+  
+  data.buffer.push("(component) ");
   }
 
   hashContexts = {'itemController': depth0};
@@ -1309,14 +1351,22 @@ function program10(depth0,data) {
 
 function program12(depth0,data) {
   
-  var buffer = '', stack1, hashTypes, hashContexts, options;
+  var buffer = '', stack1, stack2, hashContexts, hashTypes, options;
   data.buffer.push("\n  ");
-  hashTypes = {};
-  hashContexts = {};
-  options = {hash:{},contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
-  data.buffer.push(escapeExpression(((stack1 = helpers.partial || depth0.partial),stack1 ? stack1.call(depth0, "not_detected", options) : helperMissing.call(depth0, "partial", "not_detected", options))));
+  hashContexts = {'description': depth0};
+  hashTypes = {'description': "STRING"};
+  options = {hash:{
+    'description': ("Ember application")
+  },inverse:self.noop,fn:self.program(13, program13, data),contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
+  stack2 = ((stack1 = helpers['not-detected'] || depth0['not-detected']),stack1 ? stack1.call(depth0, options) : helperMissing.call(depth0, "not-detected", options));
+  if(stack2 || stack2 === 0) { data.buffer.push(stack2); }
   data.buffer.push("\n");
   return buffer;
+  }
+function program13(depth0,data) {
+  
+  
+  data.buffer.push("\n  <li>This is not an Ember application.</li>\n  <li>Your application is inside an iframe.</li>\n  <li>You are using an old version of Ember (&lt; rc5).</li>\n  <li>You are using the file:// protocol (instead of http://), in which case:\n    <ul>\n      <li>Visit the URL: chrome://extensions.</li>\n      <li>Find the Ember Inspector.</li>\n      <li>Make sure \"Allow access to file URLs\" is checked.</li>\n    </ul>\n  </li>\n  ");
   }
 
   hashTypes = {};
@@ -1338,6 +1388,25 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   
 });
 
+this["Ember"]["TEMPLATES"]["components/not-detected"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
+  var buffer = '', hashTypes, hashContexts, escapeExpression=this.escapeExpression;
+
+
+  data.buffer.push("<div class=\"error-page\">\n\n  <div class=\"error-page__content\">\n\n    <div class=\"error-page__header\">\n      <div class=\"error-page__title\">");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "description", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(" not detected!</div>\n    </div>\n\n    <div class=\"error-page__reasons\">\n\n      <div class=\"error-page__reasons-title\">Here are some common reasons this happens:</div>\n\n      <ul class=\"error-page__list\">\n        ");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "yield", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n      </ul>\n\n      If you're still having trouble, please file an issue on the Ember Inspector's\n      <a href=\"https://github.com/tildeio/ember-extension\" target=\"_blank\">GitHub page.</a>\n    </div>\n\n  </div>\n\n</div>\n");
+  return buffer;
+  
+});
+
 this["Ember"]["TEMPLATES"]["data"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
@@ -1355,10 +1424,24 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
 this["Ember"]["TEMPLATES"]["data/index"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
+  var buffer = '', stack1, stack2, hashContexts, hashTypes, options, self=this, helperMissing=helpers.helperMissing;
+
+function program1(depth0,data) {
   
+  
+  data.buffer.push("\n  <li>You are using an old version of Ember (&lt; rc7).</li>\n  <li>You are using an old version of Ember Data (&lt; 0.14).</li>\n  <li>You are using another persistence library, in which case:\n    <ul>\n      <li>Make sure the library has a data adapter.</li>\n    </ul>\n  </li>\n  ");
+  }
 
-
-  data.buffer.push("No Data Adapter Detected.\n");
+  data.buffer.push("<div class=\"data-error-page-container\">\n  ");
+  hashContexts = {'description': depth0};
+  hashTypes = {'description': "STRING"};
+  options = {hash:{
+    'description': ("Data adapter")
+  },inverse:self.noop,fn:self.program(1, program1, data),contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
+  stack2 = ((stack1 = helpers['not-detected'] || depth0['not-detected']),stack1 ? stack1.call(depth0, options) : helperMissing.call(depth0, "not-detected", options));
+  if(stack2 || stack2 === 0) { data.buffer.push(stack2); }
+  data.buffer.push("\n</div>\n");
+  return buffer;
   
 });
 
@@ -1830,7 +1913,7 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   hashContexts = {};
   options = {hash:{},contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
   data.buffer.push(escapeExpression(((stack1 = helpers.partial || depth0.partial),stack1 ? stack1.call(depth0, "view_node", options) : helperMissing.call(depth0, "partial", "view_node", options))));
-  data.buffer.push("\n      </tbody>\n    </table>\n  </div>\n\n\n  <div class=\"table-tree__filter\">\n    <div class=\"filter-bar\">\n      <button class=\"filter-bar__button filter-bar__button_type_inspect\" ");
+  data.buffer.push("\n      </tbody>\n    </table>\n  </div>\n\n  <div class=\"table-tree__filter\">\n    <div class=\"filter-bar\">\n      <div class=\"filter-bar__button filter-bar__button_type_inspect\" ");
   hashContexts = {'class': depth0};
   hashTypes = {'class': "STRING"};
   data.buffer.push(escapeExpression(helpers.bindAttr.call(depth0, {hash:{
@@ -1840,7 +1923,7 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "toggleViewInspection", {hash:{},contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("></button>\n\n      ");
+  data.buffer.push("></div>\n\n      <div class=\"filter-bar__checkbox\">\n      ");
   hashContexts = {'type': depth0,'checked': depth0,'id': depth0};
   hashTypes = {'type': "STRING",'checked': "ID",'id': "STRING"};
   options = {hash:{
@@ -1849,7 +1932,7 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
     'id': ("options-components")
   },contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
   data.buffer.push(escapeExpression(((stack1 = helpers.input || depth0.input),stack1 ? stack1.call(depth0, options) : helperMissing.call(depth0, "input", options))));
-  data.buffer.push(" <label for=\"options-components\">Components</label>\n\n\n      ");
+  data.buffer.push(" <label for=\"options-components\">Components</label>\n      </div>\n\n      <div class=\"filter-bar__checkbox\">\n        ");
   hashContexts = {'type': depth0,'checked': depth0,'id': depth0};
   hashTypes = {'type': "STRING",'checked': "ID",'id': "STRING"};
   options = {hash:{
@@ -1858,7 +1941,7 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
     'id': ("options-allViews")
   },contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
   data.buffer.push(escapeExpression(((stack1 = helpers.input || depth0.input),stack1 ? stack1.call(depth0, options) : helperMissing.call(depth0, "input", options))));
-  data.buffer.push(" <label for=\"options-allViews\">All Views</label>\n    </div>\n  </div>\n\n</div>\n\n");
+  data.buffer.push(" <label for=\"options-allViews\">All Views</label>\n      </div>\n    </div>\n  </div>\n\n</div>\n\n");
   return buffer;
   
 });

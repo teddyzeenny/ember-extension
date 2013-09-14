@@ -2,4 +2,7 @@ node_modules/
 tmp/
 .DS_Store
 extension_dist/ember-extension.zip
+
 *.xpi
+ff_extension_dist/data/vendor
+ff_extension_dist/data/images

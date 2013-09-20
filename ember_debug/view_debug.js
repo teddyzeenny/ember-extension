@@ -16,6 +16,42 @@ var ViewDebug = Ember.Object.extend(PortMixin, {
 
   retainedObjects: [],
 
+  options: {},
+
+  portNamespace: 'view',
+
+  messages: {
+    getTree: function() {
+      this.sendTree();
+    },
+    hideLayer: function() {
+      this.hideLayer();
+    },
+    showLayer: function(message) {
+      this.showLayer(message.objectId);
+    },
+    previewLayer: function(message) {
+      this.previewLayer(message.objectId);
+    },
+    hidePreview: function(message) {
+      this.hidePreview(message.objectId);
+    },
+    inspectViews: function(message) {
+      if (message.inspect) {
+        this.startInspecting();
+      } else {
+        this.stopInspecting();
+      }
+    },
+    inspectElement: function(message) {
+      this.inspectElement(message.objectId);
+    },
+    setOptions: function(message) {
+      this.set('options', message.options);
+      this.sendTree();
+    }
+  },
+
   init: function() {
     this._super();
     var self = this;
@@ -63,42 +99,6 @@ var ViewDebug = Ember.Object.extend(PortMixin, {
     Ember.View.removeMutationListener(this.viewTreeChanged);
     this.releaseCurrentObjects();
     this.stopInspecting();
-  },
-
-  options: {},
-
-  portNamespace: 'view',
-
-  messages: {
-    getTree: function() {
-      this.sendTree();
-    },
-    hideLayer: function() {
-      this.hideLayer();
-    },
-    showLayer: function(message) {
-      this.showLayer(message.objectId);
-    },
-    previewLayer: function(message) {
-      this.previewLayer(message.objectId);
-    },
-    hidePreview: function(message) {
-      this.hidePreview(message.objectId);
-    },
-    inspectViews: function(message) {
-      if (message.inspect) {
-        this.startInspecting();
-      } else {
-        this.stopInspecting();
-      }
-    },
-    inspectElement: function(message) {
-      this.inspectElement(message.objectId);
-    },
-    setOptions: function(message) {
-      this.set('options', message.options);
-      this.sendTree();
-    }
   },
 
   inspectElement: function(objectId) {
@@ -175,6 +175,7 @@ var ViewDebug = Ember.Object.extend(PortMixin, {
     Ember.run.next(function() {
       self.releaseCurrentObjects();
       var tree = self.viewTree();
+      console.log(tree);
       if (tree) {
         self.sendMessage('viewTree', {
           tree: tree

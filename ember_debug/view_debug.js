@@ -102,79 +102,6 @@ var ViewDebug = Ember.Object.extend(PortMixin, {
     this.stopInspecting();
   },
 
-  /**
-   * UTILITY FUNCTION FROM:
-   * http://mxr.mozilla.org/mozilla-central/source/toolkit/devtools/server/actors/script.js#4124
-   * Find a unique CSS selector for a given element
-   * @returns a string such that ele.ownerDocument.querySelector(reply) === ele
-   * and ele.ownerDocument.querySelectorAll(reply).length === 1
-   */
-  findCssSelector: function findCssSelector(ele) {
-    var document = ele.ownerDocument;
-    if (ele.id && document.getElementById(ele.id) === ele) {
-      return '#' + ele.id;
-    }
-
-    // Inherently unique by tag name
-    var tagName = ele.tagName.toLowerCase();
-    if (tagName === 'html') {
-      return 'html';
-    }
-    if (tagName === 'head') {
-      return 'head';
-    }
-    if (tagName === 'body') {
-      return 'body';
-    }
-
-    if (ele.parentNode == null) {
-      console.log('danger: ' + tagName);
-    }
-
-    // We might be able to find a unique class name
-    var selector, index, matches;
-    if (ele.classList.length > 0) {
-      for (var i = 0; i < ele.classList.length; i++) {
-        // Is this className unique by itself?
-        selector = '.' + ele.classList.item(i);
-        matches = document.querySelectorAll(selector);
-        if (matches.length === 1) {
-          return selector;
-        }
-        // Maybe it's unique with a tag name?
-        selector = tagName + selector;
-        matches = document.querySelectorAll(selector);
-        if (matches.length === 1) {
-          return selector;
-        }
-        // Maybe it's unique using a tag name and nth-child
-        index = positionInNodeList(ele, ele.parentNode.children) + 1;
-        selector = selector + ':nth-child(' + index + ')';
-        matches = document.querySelectorAll(selector);
-        if (matches.length === 1) {
-          return selector;
-        }
-      }
-    }
-
-    // So we can be unique w.r.t. our parent, and use recursion
-    index = positionInNodeList(ele, ele.parentNode.children) + 1;
-    selector = findCssSelector(ele.parentNode) + ' > ' +
-      tagName + ':nth-child(' + index + ')';
-
-    return selector;
-
-    // helper function
-    function positionInNodeList(element, nodeList) {
-      for (var i = 0; i < nodeList.length; i++) {
-        if (element === nodeList[i]) {
-          return i;
-        }
-      }
-      return -1;
-    }
-  },
-
   inspectElement: function(objectId) {
     var view = this.get('objectInspector').sentObjects[objectId];
     if (view && view.get('element')) {
@@ -182,7 +109,7 @@ var ViewDebug = Ember.Object.extend(PortMixin, {
         inspect(view.get('element'));
       } else { // firefox
         this.sendMessage('devtools:inspectDOMElement', {
-          elementSelector: this.findCssSelector(view.get('element'))
+          elementSelector: "#" + view.get('element').getAttribute('id')
         });
       }
     }

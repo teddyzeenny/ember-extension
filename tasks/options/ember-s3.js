@@ -1,4 +1,4 @@
 module.exports = {
   bucketName: 'ember-extension',
-  src: [ 'extension_dist/ember-extension.zip' ]
+  src: [ 'chrome_dist/ember-extension.zip' ]
 };

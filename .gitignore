@@ -1,8 +1,17 @@
 node_modules/
 tmp/
 .DS_Store
-extension_dist/ember-extension.zip
+chrome_dist/ember-extension.zip
+chrome_dist/images/
+chrome_dist/ember_debug/
+chrome_dist/vendor/
+chrome_dist/panes/ember_extension.css
+chrome_dist/panes/ember_extension.js
 
 *.xpi
-ff_extension_dist/data/vendor
-ff_extension_dist/data/images
+
+firefox_dist/data/images
+firefox_dist/data/ember_debug/
+firefox_dist/data/vendor
+firefox_dist/data/panes/ember_extension.css
+firefox_dist/data/panes/ember_extension.js

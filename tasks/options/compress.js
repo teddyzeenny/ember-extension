@@ -1,10 +1,10 @@
 module.exports = {
   main: {
     options: {
-      archive: 'extension_dist/ember-extension.zip'
+      archive: 'chrome_dist/ember-extension.zip'
     },
     expand: true,
     pretty: true,
-    src: 'extension_dist/**/*'
+    src: 'chrome_dist/**/*'
   }
 };

@@ -10,40 +10,45 @@ module.exports = {
   extension: {
     files: [{
       src: ['tmp/public/ember_debug.js'],
-      dest: 'extension_dist/ember_debug/ember_debug.js'
+      dest: 'chrome_dist/ember_debug/ember_debug.js'
     }, {
       src: ['tmp/public/ember_extension.js'],
-      dest: 'extension_dist/panes/ember_extension.js'
+      dest: 'chrome_dist/panes/ember_extension.js'
     }, {
       expand: true,
       cwd: 'vendor',
       src: ['**'],
-      dest: 'extension_dist/vendor/'
+      dest: 'chrome_dist/vendor/'
     }, {
       src: ['tmp/public/ember_extension.css'],
-      dest: 'extension_dist/panes/ember_extension.css'
+      dest: 'chrome_dist/panes/ember_extension.css'
+    }, {
+      expand: true,
+      cwd: 'images',
+      src: ['**'],
+      dest: 'chrome_dist/images'
     }]
   },
   ff_extension: {
     files: [{
       src: ['tmp/public/ember_debug.js'],
-      dest: 'ff_extension_dist/data/ember_debug/ember_debug.js'
+      dest: 'firefox_dist/data/ember_debug/ember_debug.js'
     }, {
       src: ['tmp/public/ember_extension.js'],
-      dest: 'ff_extension_dist/data/panes/ember_extension.js'
+      dest: 'firefox_dist/data/panes/ember_extension.js'
     }, {
       expand: true,
       cwd: 'vendor',
       src: ['**'],
-      dest: 'ff_extension_dist/data/vendor/'
+      dest: 'firefox_dist/data/vendor/'
     }, {
       expand: true,
-      cwd: 'extension_dist/images',
+      cwd: 'images',
       src: ['**'],
-      dest: 'ff_extension_dist/data/images/'
+      dest: 'firefox_dist/data/images/'
     } ,{
       src: ['tmp/public/ember_extension.css'],
-      dest: 'ff_extension_dist/data/panes/ember_extension.css'
+      dest: 'firefox_dist/data/panes/ember_extension.css'
     }]
   },
   tests: {

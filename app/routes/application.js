@@ -10,6 +10,7 @@ var ApplicationRoute = Ember.Route.extend({
     this.get('port').one('general:applicationBooted', this, function(message) {
       controller.set('emberApplication', message.booted);
     });
+
     this.get('port').send('general:applicationBooted');
     this._super(controller, model);
   },

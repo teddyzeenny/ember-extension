@@ -1,1 +1,3 @@
-window.EmberExtension = requireModule('main');
+window.EmberExtension = requireModule('application').create({
+  adapter: 'firefox'
+});

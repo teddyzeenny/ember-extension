@@ -105,6 +105,10 @@ var ObjectInspector = Ember.Object.extend(PortMixin, {
       value =  Ember.get(object, prop);
     }
 
+    this.sendValueToConsole(value);
+  },
+
+  sendValueToConsole: function(value) {
     window.$E = value;
     console.log('Ember Inspector ($E): ', value);
   },
@@ -308,7 +312,8 @@ var ObjectInspector = Ember.Object.extend(PortMixin, {
     });
   },
 
-  inspect: inspect
+  inspect: inspect,
+  inspectValue: inspectValue
 });
 
 

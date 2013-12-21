@@ -25,11 +25,13 @@ var PromiseTreeRoute = Ember.Route.extend({
   },
 
   addPromises: function(message) {
-    this.get('currentModel').pushObjects(this.rebuildPromises(message.promises));
+    this.get('assembler').addPromises(message.promises);
+    // this.get('currentModel').pushObjects(this.rebuildPromises(message.promises));
   },
 
   updatePromises: function(message) {
-    this.rebuildPromises(message.promises);
+    this.get('assembler').updatePromises(message.promises);
+    // this.rebuildPromises(message.promises);
   },
 
   rebuildPromises: function(promises) {

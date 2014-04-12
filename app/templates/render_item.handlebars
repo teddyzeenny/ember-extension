@@ -1,0 +1,13 @@
+<div {{bind-attr style="nodeStyle" class=":list-tree__item :row expandedClass"}}  data-label="render-item">
+  <div class="cell_type_main cell" {{action "toggleExpand" model}} {{bind-attr style="nameStyle"}}>
+
+    <span {{bind-attr title="name"}}  data-label="render-label">
+      <span class="cell__arrow"></span>
+      {{name}}
+      <span class="pill pill_not-clickable">{{ms-to-time duration}}</span>
+    </span>
+  </div>
+  <div class="cell cell_value_numeric">
+    {{readableTime}}
+  </div>
+</div>

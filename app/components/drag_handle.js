@@ -1,9 +1,10 @@
 export default Ember.Component.extend({
   classNames: ['drag-handle'],
+  classNameBindings: ['positionRight:drag-handle--right:drag-handle--left'],
   attributeBindings: ['style'],
   isDragging: false,
-  positionLeft: null,
-  positionRight: null,
+  positionLeft: 0,
+  positionRight: 0,
 
   startDragging: function() {
     var self = this,
@@ -12,10 +13,12 @@ export default Ember.Component.extend({
 
     this.set('isDragging', true);
     body.on('mousemove.' + namespace, function(e){
-      self.setProperties({
-        positionRight: body.width() - e.pageX,
-        positionLeft: e.pageX
-      });
+      if (self.get('positionRight')) {
+        self.set('positionRight', body.width() - e.pageX);
+      }
+      else if (self.get('positionLeft')) {
+        self.set('positionLeft', e.pageX);
+      }
     })
     .on('mouseup.' + namespace + ' mouseleave.' + namespace, function(){
       self.stopDragging();
@@ -38,6 +41,14 @@ export default Ember.Component.extend({
   },
 
   style: function () {
-    return 'right:' + this.get('positionRight') + 'px';
-  }.property('positionRight')
+    if (this.get('positionRight')) {
+      return 'right:' + this.get('positionRight') + 'px';
+    }
+    else if (this.get('positionLeft')) {
+      return 'left:' + this.get('positionLeft') + 'px';
+    }
+    else {
+      return '';
+    }
+  }.property('positionRight', 'positionLeft')
 });

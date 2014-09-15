@@ -2,7 +2,6 @@ export default Ember.Component.extend({
   classNames: ['drag-handle'],
   classNameBindings: ['positionRight:drag-handle--right:drag-handle--left'],
   attributeBindings: ['style'],
-  isDragging: false,
   positionLeft: 0,
   positionRight: 0,
 
@@ -15,7 +14,7 @@ export default Ember.Component.extend({
         $containerOffsetRight = $containerOffsetLeft + $container.width(),
         namespace = 'drag-' + this.get('elementId');
 
-    this.set('isDragging', true);
+    this.sendAction('action', true);
 
     $body.on('mousemove.' + namespace, function(e){
 
@@ -33,7 +32,7 @@ export default Ember.Component.extend({
   },
 
   stopDragging: function() {
-    this.set('isDragging', false);
+    this.sendAction('action', false);
     Ember.$('body').off('.drag-' + this.get('elementId'));
   },
 

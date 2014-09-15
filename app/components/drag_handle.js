@@ -8,16 +8,23 @@ export default Ember.Component.extend({
 
   startDragging: function() {
     var self = this,
-        body = Ember.$('body'),
+        $body = Ember.$('body'),
+        bodyWidth = $body.width(),
+        $container = this.$().parent(),
+        $containerOffsetLeft = $container.offset().left,
+        $containerOffsetRight = $containerOffsetLeft + $container.width(),
         namespace = 'drag-' + this.get('elementId');
 
     this.set('isDragging', true);
-    body.on('mousemove.' + namespace, function(e){
+
+    $body.on('mousemove.' + namespace, function(e){
+
       if (self.get('positionRight')) {
-        self.set('positionRight', body.width() - e.pageX);
+        self.set('positionRight', bodyWidth - e.pageX - (bodyWidth -
+          $containerOffsetRight));
       }
       else if (self.get('positionLeft')) {
-        self.set('positionLeft', e.pageX);
+        self.set('positionLeft', e.pageX - $containerOffsetLeft);
       }
     })
     .on('mouseup.' + namespace + ' mouseleave.' + namespace, function(){

@@ -8,8 +8,6 @@ export default Ember.Component.extend({
 
   startDragging: function() {
     var self = this,
-        $body = Ember.$('body'),
-        bodyWidth = $body.width(),
         $container = this.$().parent(),
         $containerOffsetLeft = $container.offset().left,
         $containerOffsetRight = $containerOffsetLeft + $container.width(),
@@ -17,20 +15,17 @@ export default Ember.Component.extend({
 
     this.sendAction('action', true);
 
-    $body.on('mousemove.' + namespace, function(e){
+    Ember.$('body').on('mousemove.' + namespace, function(e){
 
       if (self.get('positionRight')) {
-        var right = bodyWidth - e.pageX - (bodyWidth - $containerOffsetRight);
-        if (right >= self.get('minWidth')) {
-          self.set('positionRight', right);
-        }
+        var right = $containerOffsetRight - e.pageX;
+        if (right >= self.get('minWidth')) self.set('positionRight', right);
       }
       else if (self.get('positionLeft')) {
         var left = e.pageX - $containerOffsetLeft;
-        if (left >= self.get('minWidth')) {
-          self.set('positionLeft', left);
-        }
+        if (left >= self.get('minWidth')) self.set('positionLeft', left);
       }
+
     })
     .on('mouseup.' + namespace + ' mouseleave.' + namespace, function(){
       self.stopDragging();

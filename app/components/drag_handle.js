@@ -4,6 +4,7 @@ export default Ember.Component.extend({
   attributeBindings: ['style'],
   positionLeft: 0,
   positionRight: 0,
+  minWidth: 60,
 
   startDragging: function() {
     var self = this,
@@ -19,11 +20,16 @@ export default Ember.Component.extend({
     $body.on('mousemove.' + namespace, function(e){
 
       if (self.get('positionRight')) {
-        self.set('positionRight', bodyWidth - e.pageX - (bodyWidth -
-          $containerOffsetRight));
+        var right = bodyWidth - e.pageX - (bodyWidth - $containerOffsetRight);
+        if (right >= self.get('minWidth')) {
+          self.set('positionRight', right);
+        }
       }
       else if (self.get('positionLeft')) {
-        self.set('positionLeft', e.pageX - $containerOffsetLeft);
+        var left = e.pageX - $containerOffsetLeft;
+        if (left >= self.get('minWidth')) {
+          self.set('positionLeft', left);
+        }
       }
     })
     .on('mouseup.' + namespace + ' mouseleave.' + namespace, function(){

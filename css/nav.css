@@ -50,6 +50,10 @@
   cursor: default;
 }
 
+.app.is-dragging .nav li > a {
+  cursor: col-resize;
+}
+
 .nav li > a polygon,
 .nav li > a path,
 .nav li > a rect,

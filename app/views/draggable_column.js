@@ -5,5 +5,6 @@
 export default Ember.View.extend({
   layoutName: 'draggableColumn',
   tagName: '', // Prevent wrapping in a div
-  side: 'left'
+  side: 'left',
+  minWidth: 60
 });

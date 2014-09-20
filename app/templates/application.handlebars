@@ -5,12 +5,12 @@
     </div>
 
     {{#if inspectorExpanded}}
-      {{#view "draggableColumn"
+      {{#draggable-column
               side="right"
               width=inspectorWidth
               classNames="split__panel"}}
         {{render "mixinStack"}}
-      {{/view}}
+      {{/draggable-column}}
     {{/if}}
   </div>
 

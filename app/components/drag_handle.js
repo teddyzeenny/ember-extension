@@ -22,7 +22,9 @@ export default Ember.Component.extend({
                        e.pageX - $containerOffsetLeft :
                        $containerOffsetRight - e.pageX;
 
-      if (position >= self.get('minWidth')) self.set('position', position);
+      if (position >= self.get('minWidth')) {
+        self.set('position', position);
+      }
     })
     .on('mouseup.' + namespace + ' mouseleave.' + namespace, function(){
       self.stopDragging();

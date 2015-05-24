@@ -76,8 +76,8 @@ var ViewDebug = Ember.Object.extend(PortMixin, {
       var model;
       if (message.renderNodeId) {
         // >= Ember 1.13
-        var renderNode = this.get('_lastNodes').objectAt(message.renderNodeId);
-        model = this._modelForNode(renderNode);
+        var inspectedNode = this.get('_lastNodes').objectAt(message.renderNodeId);
+        model = inspectedNode.getModel();
       } else {
         // < Ember 1.13
         var view = this.get('objectInspector').sentObjects[message.viewId];
@@ -279,9 +279,9 @@ var ViewDebug = Ember.Object.extend(PortMixin, {
       this.appendChildren(rootView, children, retained);
     } else {
       this.get('_lastNodes').clear();
-      var renderNode = rootView._renderNode;
-      tree = { value: this._inspectNode(renderNode), children: children };
-      this._appendNodeChildren(renderNode, children);
+      var inspectedNode = Ember.Debugging.RenderDebug.getTopLevelNode(emberApp);
+      tree = { value: this._inspectNode(inspectedNode), children: children };
+      this._appendNodeChildren(inspectedNode, children);
     }
 
     return tree;
@@ -614,22 +614,20 @@ var ViewDebug = Ember.Object.extend(PortMixin, {
    * @return {Boolean}
    */
   _isGlimmer: function() {
-    var id = Ember.keys(Ember.View.views)[0];
-    return id && !Ember.View.views[id].get('_childViews');
+    return !!(Ember.Debugging && Ember.Debugging.RenderDebug);
   },
 
   /**
    * Walk the render node hierarchy and build the tree.
    *
-   * @param  {Object} renderNode
+   * @param  {Object} inspectedNode
    * @param  {Array} children
    */
-  _appendNodeChildren: function(renderNode, children) {
+  _appendNodeChildren: function(inspectedNode, children) {
     var self = this;
-    var childNodes = renderNode.childNodes;
-    if (!childNodes) { return; }
+    var childNodes = inspectedNode.buildChildren();
     childNodes.forEach(function(childNode) {
-      if (self._shouldShowNode(childNode, renderNode)) {
+      if (self._shouldShowNode(childNode, inspectedNode)) {
         var grandChildren = [];
         children.push({ value: self._inspectNode(childNode), children: grandChildren});
         self._appendNodeChildren(childNode, grandChildren);
@@ -647,83 +645,22 @@ var ViewDebug = Ember.Object.extend(PortMixin, {
    * and also checks the filtering options. For example,
    * showing Ember component nodes can be toggled.
    *
-   * @param  {Object} renderNode
-   * @param  {Object} parentNode
+   * @param  {Object} inspectedNode
    * @return {Boolean} `true` for show and `false` to skip the node
    */
-  _shouldShowNode: function(renderNode, parentNode) {
+  _shouldShowNode: function(inspectedNode) {
 
     // Filter out non-(view/components)
-    if (!this._nodeIsView(renderNode)) {
+    if (!inspectedNode.isComponentNode()) {
       return false;
     }
-    // Has either a template or a view/component instance
-    if (!this._nodeTemplateName(renderNode) && !this._nodeHasViewInstance(renderNode)) {
+    // Has either need a template or a view/component instance
+    if (!inspectedNode.getTemplateName() && !inspectedNode.hasComponentInstance()) {
       return false;
     }
-    return (this.options.allViews || this._nodeHasOwnController(renderNode, parentNode)) &&
-        (this.options.components || !(this._nodeIsEmberComponent(renderNode))) &&
-        (this._nodeHasViewInstance(renderNode) || this._nodeHasOwnController(renderNode, parentNode));
-  },
-
-  /**
-   * The node's model. If the view has a controller,
-   * it will be the controller's `model` property.s
-   *
-   * @param  {Object} renderNode
-   * @return {Object} the model
-   */
-  _modelForNode: function(renderNode) {
-    var controller = this._controllerForNode(renderNode);
-    if (controller) {
-      return controller.get('model');
-    }
-  },
-
-  /**
-   * Not all nodes are actually views/components.
-   * Nodes can be attributes for example.
-   *
-   * @param  {Object} renderNode
-   * @return {Boolean}
-   */
-  _nodeIsView: function(renderNode) {
-    return !!renderNode.state.manager;
-  },
-
-  /**
-   * Check if a node has its own controller (as opposed to sharing
-   * its parent's controller).
-   * Useful to identify route views from other views.
-   *
-   * @param  {Object} renderNode
-   * @param  {Object} parentNode
-   * @return {Boolean}
-   */
-  _nodeHasOwnController: function(renderNode, parentNode) {
-    return this._controllerForNode(renderNode) !== this._controllerForNode(parentNode);
-  },
-
-  /**
-   * Check if the node has a view instance.
-   * Virtual nodes don't have a view/component instance.
-   *
-   * @param  {Object} renderNode
-   * @return {Boolean}
-   */
-  _nodeHasViewInstance: function(renderNode) {
-    return !!this._viewInstanceForNode(renderNode);
-  },
-
-
-  /**
-   * Returns the nodes' controller.
-   *
-   * @param  {Object} renderNode
-   * @return {Ember.Controller}
-   */
-  _controllerForNode: function(renderNode) {
-    return renderNode.lastResult.scope.locals.controller.value();
+    return (this.options.allViews || inspectedNode.hasOwnController()) &&
+        (this.options.components || !(inspectedNode.isEmberComponent())) &&
+        (inspectedNode.hasComponentInstance() || inspectedNode.hasOwnController());
   },
 
   /**
@@ -731,46 +668,46 @@ var ViewDebug = Ember.Object.extend(PortMixin, {
    * the required properties to be added to the view tree
    * to be sent.
    *
-   * @param  {Object} renderNode
+   * @param  {Object} inspectedNode
    * @return {Object} the object containing the required values
    */
-  _inspectNode: function(renderNode) {
+  _inspectNode: function(inspectedNode) {
     var name, viewClassName, completeViewClassName, tagName, viewId, timeToRender;
 
-    var viewClass = this._viewInstanceForNode(renderNode);
+    var viewClass = inspectedNode.getComponentInstance();
 
     if (viewClass) {
-      viewClassName = shortViewName(viewClass);
+      viewClassName = inspectedNode.getComponentInstanceName();
       completeViewClassName = viewName(viewClass);
       tagName = viewClass.get('tagName') || 'div';
       viewId = this.retainObject(viewClass);
       timeToRender = this._durations[viewId];
     }
 
-    name = this._nodeDescription(renderNode);
+    name = inspectedNode.getName();
 
     var value = {
-      template: this._nodeTemplateName(renderNode) || '(inline)',
+      template: inspectedNode.getTemplateName() || '(inline)',
       name: name,
       objectId: viewId,
       viewClass: viewClassName,
       duration: timeToRender,
       completeViewClass: completeViewClassName,
-      isComponent: this._nodeIsEmberComponent(renderNode),
+      isComponent: inspectedNode.isEmberComponent(),
       tagName: tagName,
       isVirtual: !viewClass
     };
 
 
-    var controller = this._controllerForNode(renderNode);
-    if (controller && !(this._nodeIsEmberComponent(renderNode))) {
+    var controller = inspectedNode.getController();
+    if (controller && !(inspectedNode.isEmberComponent())) {
       value.controller = {
         name: shortControllerName(controller),
         completeName: controllerName(controller),
         objectId: this.retainObject(controller)
       };
 
-      var model = this._modelForNode(renderNode);
+      var model = inspectedNode.getModel();
       if (model) {
         if (Ember.Object.detectInstance(model) || Ember.typeOf(model) === 'array') {
           value.model = {
@@ -788,101 +725,26 @@ var ViewDebug = Ember.Object.extend(PortMixin, {
       }
     }
 
-    value.renderNodeId = this.get('_lastNodes').push(renderNode) - 1;
+    value.renderNodeId = this.get('_lastNodes').push(inspectedNode) - 1;
 
     return value;
   },
 
   /**
-   * Get the node's template name. Relies on an htmlbars
-   * feature that adds the module name as a meta property
-   * to compiled templates.
-   *
-   * @param  {Object} renderNode
-   * @return {String} the template name
-   */
-  _nodeTemplateName: function(renderNode) {
-    var template = renderNode.lastResult.template;
-    if (template && template.meta && template.meta.moduleName) {
-      return template.meta.moduleName.replace(/\.hbs$/, '');
-    }
-  },
-
-  /**
-   * The node's name. Should be anything that the user
-   * can use to identity what node we are talking about.
-   *
-   * Usually either the view instance name, or the template name.
-   *
-   * @param  {Object} renderNode
-   * @return {String}
-   */
-  _nodeDescription: function(renderNode) {
-    var name;
-
-    var viewClass = this._viewInstanceForNode(renderNode);
-
-    if (viewClass) {
-      //. Has a view instance - take the view's name
-      name = viewClass.get('_debugContainerKey');
-      if (name) {
-        name = name.replace(/.*(view|component):/, '').replace(/:$/, '');
-      }
-    } else {
-      // Virtual - no view instance
-      var templateName = this._nodeTemplateName(renderNode);
-      if (templateName) {
-        return templateName.replace(/^.*templates\//, '').replace(/\//g, '.');
-      }
-    }
-
-    // If application view was not defined, it uses a `toplevel` view
-    if (name === 'toplevel') {
-      name = 'application';
-    }
-    return name;
-  },
-
-  /**
-   * Return a node's view instance.
-   *
-   * @param  {Object} renderNode
-   * @return {Ember.View|Ember.Component} The view or component instance
-   */
-  _viewInstanceForNode: function(renderNode) {
-    return renderNode.emberView;
-  },
-
-  /**
-   * Returns whether the node is an Ember Component or not.
-   *
-   * @param  {Object} renderNode
-   * @return {Boolean}
-   */
-  _nodeIsEmberComponent: function(renderNode) {
-    var viewInstance = this._viewInstanceForNode(renderNode);
-    return !!(viewInstance && (viewInstance instanceof Ember.Component));
-  },
-
-  /**
    * Highlight a render node on the screen.
    *
-   * @param  {Object} renderNode
+   * @param  {Object} inspectedNode
    * @param  {Boolean} isPreview (whether to pin the layer or not)
    */
-  _highlightNode: function(renderNode, isPreview) {
+  _highlightNode: function(inspectedNode, isPreview) {
     var modelName;
-    // Todo: should be in Ember core
-    var range = document.createRange();
-    range.setStartBefore(renderNode.firstNode);
-    range.setEndAfter(renderNode.lastNode);
-    var rect = range.getBoundingClientRect();
+    var rect = inspectedNode.getBoundingClientRect();
 
     var options = {
       isPreview: isPreview
     };
 
-    var controller = this._controllerForNode(renderNode);
+    var controller = inspectedNode.getController();
     if (controller) {
       options.controller = {
         name: controllerName(controller),
@@ -890,17 +752,15 @@ var ViewDebug = Ember.Object.extend(PortMixin, {
       };
     }
 
-    var templateName = this._nodeTemplateName(renderNode);
+    var templateName = inspectedNode.getTemplateName();
     if (templateName) {
       options.template = {
         name: templateName
       };
     }
 
-    var model;
-    if (controller) {
-      model = controller.get('model');
-    }
+    var model = inspectedNode.getModel();
+
     if (model) {
       modelName = this.get('objectInspector').inspect(model);
       options.model = {
@@ -909,7 +769,7 @@ var ViewDebug = Ember.Object.extend(PortMixin, {
       };
     }
 
-    var view = this._viewInstanceForNode(renderNode);
+    var view = inspectedNode.getComponentInstance();
 
     if (view) {
       options.view = {

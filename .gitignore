@@ -3,6 +3,7 @@
 # compiled output
 /dist
 /tmp
+/old_dist
 
 .DS_Store
 

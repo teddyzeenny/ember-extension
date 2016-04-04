@@ -58,7 +58,7 @@ export default BasicAdapter.extend({
   },
 
   onVersionMismatch() {
-    window.location.href = '../panes-1/index.html';
+    window.location.href = '../panes/index.html';
   },
 
   /**
@@ -91,7 +91,7 @@ function loadEmberDebug() {
   let xhr;
   if (!emberDebug) {
     xhr = new XMLHttpRequest();
-    xhr.open("GET", chrome.extension.getURL('/panes/ember_debug.js'), false);
+    xhr.open("GET", chrome.extension.getURL('/panes-1/ember_debug.js'), false);
     xhr.send();
     emberDebug = xhr.responseText;
   }

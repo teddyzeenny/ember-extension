@@ -25,7 +25,7 @@ export default BasicAdapter.extend({
 
   onVersionMismatch() {
     this.sendMessage({ name: 'switch-ember-debug' });
-    window.location.href = 'panes-1/index.html' + window.location.search;
+    window.location.href = 'panes/index.html' + window.location.search;
   },
 
   _connect() {

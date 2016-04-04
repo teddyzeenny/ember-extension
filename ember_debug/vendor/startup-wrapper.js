@@ -19,7 +19,7 @@ if (typeof env !== 'undefined') {
   currentEnv = env;
 }
 
-var EMBER_VERSION_SUPPORTED = 2;
+var EMBER_VERSION_SUPPORTED = 1;
 
 (function(adapter) {
   onEmberReady(function() {

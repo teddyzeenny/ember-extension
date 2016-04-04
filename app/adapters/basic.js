@@ -13,7 +13,7 @@
  */
 import Ember from "ember";
 const { computed, K } = Ember;
-const EMBER_VERSION_SUPPORTED = 2;
+const EMBER_VERSION_SUPPORTED = 1;
 
 export default Ember.Object.extend({
   init() {

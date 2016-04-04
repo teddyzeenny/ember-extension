@@ -16,6 +16,15 @@ export default BasicAdapter.extend({
     this._onMessage = this._onMessage.bind(this);
     window.addEventListener("message", this._onMessage, false);
 
+    console.log('on message received');
+    this.onMessageReceived(message => {
+      console.log('version');
+      let { name, version } = message;
+      if (name === 'version' && +version.split('.')[0] < 2) {
+        window.location.href = '../panes-1/index.html';
+      }
+    });
+    this.sendMessage({ name: 'send-version' });
   }),
 
   _onMessage(evt) {

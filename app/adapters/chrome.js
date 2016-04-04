@@ -45,6 +45,12 @@ export default BasicAdapter.extend({
         sendIframes([opts.url]);
       }
     });
+    this.onMessageReceived((message) => {
+      let { name, version } = message;
+      if (name === 'version' && +version.split('.')[0] < 2) {
+        window.location.href = '../panes-1/index.html';
+      }
+    });
   }),
 
   willReload() {

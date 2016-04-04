@@ -33,6 +33,17 @@ export default BasicAdapter.extend({
         this._messageReceived(message);
       }
     });
+    console.log("here");
+    this.onMessageReceived(message => {
+      console.log('version');
+      let { name, version } = message;
+      if (name === 'version' && +version.split('.')[0] < 2) {
+        this.sendMessage({ name: 'switch-ember-debug' });
+        window.location.href = 'panes-1/index.html' + window.location.search;
+      }
+    });
+    this.sendMessage({ name: 'send-version' });
+
   })
 });
 

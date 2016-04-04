@@ -84,6 +84,7 @@ let pageMod = PageMod({
   contentScriptFile: data.url('content-script.js'),
   contentScriptOptions: {
     emberDebugScript: data.load("panes/ember_debug.js"),
+    emberDebugScript1: data.load("panes-1/ember_debug.js"),
     emberInPageScript: data.load("panes/in-page-script.js")
   },
   contentScriptWhen: "start",

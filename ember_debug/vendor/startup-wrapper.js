@@ -27,6 +27,12 @@ if (typeof env !== 'undefined') {
     }
     // prevent from injecting twice
     if (!Ember.EmberInspectorDebugger) {
+      var version = Ember.VERSION.split('.');
+      if (+version[0] < 2) {
+        sendVersionMiss();
+        return;
+      }
+
       define('ember-debug/config', function() {
         return {
           default: {
@@ -140,6 +146,26 @@ if (typeof env !== 'undefined') {
     return namespaces.filter(function(namespace) {
       return namespace instanceof Ember.Application;
     });
+  }
+
+
+  function sendVersionMiss() {
+    var adapter = requireModule('ember-debug/adapters/' + currentAdapter)['default'].create();
+    function send() {
+      adapter.sendMessage({
+        name: 'version',
+        version: Ember.VERSION,
+        from: 'inspectedWindow'
+      });
+    }
+    send();
+    adapter.onMessageReceived(function(message) {
+      console.log('please send');
+      if (message.name === 'send-version') {
+        send();
+      }
+    });
+    console.log('send version miss');
   }
 
 }(currentAdapter));

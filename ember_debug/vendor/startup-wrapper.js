@@ -27,14 +27,13 @@ var EMBER_VERSION_SUPPORTED = 2;
     if (window.NO_EMBER_DEBUG) {
       return;
     }
+    if (+Ember.VERSION.split('.')[0] < EMBER_VERSION_SUPPORTED) {
+      sendVersionMiss();
+      return;
+    }
     // prevent from injecting twice
     if (!Ember.EmberInspectorDebugger) {
       // Make sure we only work for the supported version
-      if (+Ember.VERSION.split('.')[0] < EMBER_VERSION_SUPPORTED) {
-        sendVersionMiss();
-        return;
-      }
-
       define('ember-debug/config', function() {
         return {
           default: {
@@ -159,7 +158,7 @@ var EMBER_VERSION_SUPPORTED = 2;
       }
     });
     sendVersionMismatch();
-    
+
     function sendVersionMismatch() {
       adapter.sendMessage({
         name: 'version-mismatch',

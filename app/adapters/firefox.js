@@ -1,5 +1,7 @@
 import Ember from "ember";
 import BasicAdapter from "./basic";
+import config from 'ember-inspector/config/environment';
+const EMBER_VERSION_SUPPORTED = config.emberVersionSupported;
 
 export default BasicAdapter.extend({
   name: 'firefox',
@@ -15,6 +17,7 @@ export default BasicAdapter.extend({
   },
 
   onVersionMismatch() {
+    this.sendMessage({ type: `injectEmberDebug`, version: EMBER_VERSION_SUPPORTED === 1 ? 2 : 1 });
     window.location.href = '../panes-1/index.html';
   },
 
@@ -48,7 +51,7 @@ export default BasicAdapter.extend({
 
   _sendIframes(urls) {
     urls.forEach(url => {
-      this.sendMessage({ type: "injectEmberDebug", frameURL: url });
+      this.sendMessage({ type: 'injectEmberDebug', frameURL: url });
     });
   },
 

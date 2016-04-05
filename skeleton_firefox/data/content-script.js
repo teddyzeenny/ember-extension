@@ -6,7 +6,8 @@ function init() {
   window.addEventListener("message", onEmberVersion, true);
   document.addEventListener("ember-debug-send", onEmberDebugEvent, false);
   self.port.on("emberDevTool", onEmberInspectorMessage);
-  self.port.on("injectEmberDebug", onInjectEmberDebug);
+  self.port.on("injectEmberDebug2", onInjectEmberDebug2);
+  self.port.on("injectEmberDebug1", onInjectEmberDebug1);
 
   // NOTE: needed to cleanup on legacy Firefox versions
   self.on("detach", onCleanupListeners);
@@ -37,7 +38,8 @@ function onCleanupListeners() {
     self.port.removeListener("emberDevTool", onEmberInspectorMessage);
   } catch(e) {}
   try {
-    self.port.removeListener("injectEmberDebug", onInjectEmberDebug);
+    self.port.removeListener("injectEmberDebug2", onInjectEmberDebug2);
+    self.port.removeListener("injectEmberDebug1", onInjectEmberDebug1);
   } catch(e) {}
 }
 
@@ -48,9 +50,13 @@ function onEmberVersion(message) {
   }
 }
 
-function onInjectEmberDebug() {
+function onInjectEmberDebug2() {
   //console.debug("ON INJECT EMBER DEBUG ON:", window.location.href);
-  document.defaultView.eval(self.options.emberDebugScript);
+  document.defaultView.eval(self.options.emberDebugScript2);
+}
+function onInjectEmberDebug1() {
+  //console.debug("ON INJECT EMBER DEBUG ON:", window.location.href);
+  document.defaultView.eval(self.options.emberDebugScript1);
 }
 
 function injectInPageScript() {

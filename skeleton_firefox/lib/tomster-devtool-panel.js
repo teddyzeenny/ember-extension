@@ -92,7 +92,7 @@ let EmberInspector = Class({
 
     log("_handleTargetTabLoad", tabId, worker.url);
 
-    tabs.sendToWorkersByTabId(tabId, "injectEmberDebug", null);
+    tabs.sendToWorkersByTabId(tabId, "injectEmberDebug2", null);
 
     this.iframeWindow.contentWindow.location.reload(true);
   },
@@ -102,6 +102,9 @@ let EmberInspector = Class({
     if (msg.origin === "resource://ember-inspector-at-emberjs-dot-com") {
       if (msg.data && msg.data.type === 'devtools:openSource') {
         openSource(this.toolbox._target, msg.data.url, msg.data.line);
+      } else if(msg.data.type === 'injectEmberDebug') {
+        // Request from devtools inspector to inject an ember debug version
+        tabs.sendToWorkersByTabId(this.targetTabId, "injectEmberDebug" + msg.data.version, null);
       } else {
         this._sendToTargetTab(msg.data);
       }

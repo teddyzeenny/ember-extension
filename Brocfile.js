@@ -170,7 +170,6 @@ var skeleton_firefox = replace('skeleton_firefox', {
 
 var firefox = mergeTrees([
   mv(mergeTrees([tree, firefoxAndChromeExtra, emberDebugs.firefox]), 'data/panes'),
-  mv('old_dist/firefox/panes', 'data/panes-1'),
   skeleton_firefox
 ]);
 

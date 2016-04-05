@@ -46,9 +46,9 @@
       return;
     }
     if (e.data.name === 'switch-ember-debug') {
-      injectDaDebug('panes-1/ember_debug.js');
+      injectEmberDebug('panes-1/ember_debug.js');
     }
-  });
+  });  
 
   if (!window.emberInspector) {
     alert('Unable to open the inspector in a popup.  Please enable popups and retry.');
@@ -56,12 +56,13 @@
   }
   document.documentElement.dataset.emberExtension = 1;
 
-  function injectDaDebug(fileName) {
+  function injectEmberDebug(fileName) {
     var script = document.createElement('script');
     script.src = url + '/' + fileName;
     document.body.appendChild(script);
   }
-  injectDaDebug('ember_debug.js');
+
+  injectEmberDebug('ember_debug.js');
 
   function locationOrigin() {
     var origin = window.location.origin;

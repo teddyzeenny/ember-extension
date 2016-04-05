@@ -27,7 +27,7 @@ var EMBER_VERSION_SUPPORTED = 2;
     if (window.NO_EMBER_DEBUG) {
       return;
     }
-    if (+Ember.VERSION.split('.')[0] < EMBER_VERSION_SUPPORTED) {
+    if (+Ember.VERSION.split('.')[0] !== EMBER_VERSION_SUPPORTED) {
       sendVersionMiss();
       return;
     }

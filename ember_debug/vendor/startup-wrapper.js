@@ -19,6 +19,8 @@ if (typeof env !== 'undefined') {
   currentEnv = env;
 }
 
+var EMBER_VERSION_SUPPORTED = 2;
+
 (function(adapter) {
   onEmberReady(function() {
     // global to prevent injection
@@ -27,8 +29,8 @@ if (typeof env !== 'undefined') {
     }
     // prevent from injecting twice
     if (!Ember.EmberInspectorDebugger) {
-      var version = Ember.VERSION.split('.');
-      if (+version[0] < 2) {
+      // Make sure we only work for the supported version
+      if (+Ember.VERSION.split('.')[0] < EMBER_VERSION_SUPPORTED) {
         sendVersionMiss();
         return;
       }
@@ -151,21 +153,23 @@ if (typeof env !== 'undefined') {
 
   function sendVersionMiss() {
     var adapter = requireModule('ember-debug/adapters/' + currentAdapter)['default'].create();
-    function send() {
+    adapter.onMessageReceived(function(message) {
+      if (message.name === 'check-version') {
+        sendVersionMismatch();
+      }
+    });
+    sendVersionMismatch();
+    
+    function sendVersionMismatch() {
       adapter.sendMessage({
-        name: 'version',
+        name: 'version-mismatch',
         version: Ember.VERSION,
         from: 'inspectedWindow'
       });
     }
-    send();
-    adapter.onMessageReceived(function(message) {
-      console.log('please send');
-      if (message.name === 'send-version') {
-        send();
-      }
-    });
-    console.log('send version miss');
+
   }
+
+
 
 }(currentAdapter));

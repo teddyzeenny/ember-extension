@@ -13,7 +13,26 @@
  */
 import Ember from "ember";
 const { computed, K } = Ember;
+const EMBER_VERSION_SUPPORTED = 2;
+
 export default Ember.Object.extend({
+  init() {
+    this._super(...arguments);
+    this._checkVersion();
+  },
+
+  _checkVersion() {
+    this.onMessageReceived(message => {
+      let { name, version } = message;
+      if (name === 'version-mismatch' && +version.split('.')[0] < EMBER_VERSION_SUPPORTED) {
+        this.onVersionMismatch();
+      }
+    });
+    this.sendMessage({ name: 'check-version' });
+  },
+
+  onVersionMismatch: K,
+
   name: 'basic',
   /**
     Used to send messages to EmberDebug

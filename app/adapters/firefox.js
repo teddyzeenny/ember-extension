@@ -1,31 +1,29 @@
 import Ember from "ember";
 import BasicAdapter from "./basic";
-const { on } = Ember;
 
 export default BasicAdapter.extend({
   name: 'firefox',
+
+  init() {
+    this._connect();
+    return this._super(...arguments);
+  },
 
   sendMessage(options) {
     options = options || {};
     window.parent.postMessage(options, "*");
   },
 
-  _connect: on('init', function() {
+  onVersionMismatch() {
+    window.location.href = '../panes-1/index.html';
+  },
+
+  _connect() {
     // NOTE: chrome adapter sends a appId message on connect (not needed on firefox)
     //this.sendMessage({ appId: "test" });
     this._onMessage = this._onMessage.bind(this);
     window.addEventListener("message", this._onMessage, false);
-
-    console.log('on message received');
-    this.onMessageReceived(message => {
-      console.log('version');
-      let { name, version } = message;
-      if (name === 'version' && +version.split('.')[0] < 2) {
-        window.location.href = '../panes-1/index.html';
-      }
-    });
-    this.sendMessage({ name: 'send-version' });
-  }),
+  },
 
   _onMessage(evt) {
     if (this.isDestroyed || this.isDestroying) {

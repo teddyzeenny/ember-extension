@@ -1,11 +1,18 @@
 /* globals chrome */
 import BasicAdapter from "./basic";
 import Ember from 'ember';
-const { on, computed } = Ember;
+const { computed } = Ember;
 
 let emberDebug = null;
 
 export default BasicAdapter.extend({
+  init() {
+    this._connect();
+    this._handleReload();
+    this._injectDebugger();
+    return this._super(...arguments);
+  },
+
   name: 'chrome',
 
   sendMessage(options) {
@@ -17,8 +24,7 @@ export default BasicAdapter.extend({
     return chrome.extension.connect();
   }),
 
-  _connect: on('init', function() {
-    let self = this;
+  _connect() {
     let chromePort = this.get('_chromePort');
     chromePort.postMessage({ appId: chrome.devtools.inspectedWindow.tabId });
 
@@ -26,35 +32,33 @@ export default BasicAdapter.extend({
       if (typeof message.type === 'string' && message.type === 'iframes') {
         sendIframes(message.urls);
       }
-      self._messageReceived(message);
+      this._messageReceived(message);
     });
-  }),
+  },
 
-  _handleReload: on('init', function() {
+  _handleReload() {
     let self = this;
     chrome.devtools.network.onNavigated.addListener(function() {
       self._injectDebugger();
       location.reload(true);
     });
-  }),
+  },
 
-  _injectDebugger: on('init', function() {
+  _injectDebugger() {
     chrome.devtools.inspectedWindow.eval(loadEmberDebug());
     chrome.devtools.inspectedWindow.onResourceAdded.addListener(function(opts) {
       if (opts.type === 'document') {
         sendIframes([opts.url]);
       }
     });
-    this.onMessageReceived((message) => {
-      let { name, version } = message;
-      if (name === 'version' && +version.split('.')[0] < 2) {
-        window.location.href = '../panes-1/index.html';
-      }
-    });
-  }),
+  },
 
   willReload() {
     this._injectDebugger();
+  },
+
+  onVersionMismatch() {
+    window.location.href = '../panes-1/index.html';
   },
 
   /**

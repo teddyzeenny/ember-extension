@@ -176,7 +176,6 @@ var firefox = mergeTrees([
 
 var chrome = mergeTrees([
   mv(mergeTrees([tree, firefoxAndChromeExtra, emberDebugs.chrome]), 'panes'),
-  mv('old_dist/chrome/panes', 'panes-1'),
   skeleton_chrome
 ]);
 

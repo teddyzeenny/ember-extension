@@ -13,7 +13,8 @@
  */
 import Ember from "ember";
 const { computed, K } = Ember;
-const EMBER_VERSION_SUPPORTED = 1;
+import config from 'ember-inspector/config/environment';
+const EMBER_VERSION_SUPPORTED = config.emberVersionSupported;
 
 export default Ember.Object.extend({
   init() {

@@ -10,5 +10,8 @@ window.deprecationWorkflow.config = {
   workflow: [{
     handler: 'throw',
     matchMessage: /same function as getter and setter/
-  }
-]};
+  }, {
+    handler: 'throw',
+    matchMessage: /`lookup` was called on a Registry/
+  }]
+};

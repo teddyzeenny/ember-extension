@@ -1,14 +1,14 @@
 /* jshint ignore:start */
 import Ember from "ember";
 import { module, test } from 'qunit';
+import computed from 'ember-new-computed';
 
 let EmberDebug;
 let port, name, message;
 let App;
 let objectInspector;
 
-const { run, guidFor, Object: EmberObject, computed } = Ember;
-const { Handlebars: { compile } } = Ember;
+const { run, guidFor, Object: EmberObject, Handlebars: { compile } } = Ember;
 
 function setupApp() {
   App = Ember.Application.create();
@@ -27,7 +27,7 @@ function setupApp() {
 let ignoreErrors = true;
 
 module("Ember Debug - Object Inspector", {
-  beforeEach() {
+  beforeEach: async function t() {
     /* globals require */
     EmberDebug = require('ember-debug/main').default;
     EmberDebug.Port = EmberDebug.Port.extend({
@@ -45,6 +45,7 @@ module("Ember Debug - Object Inspector", {
       EmberDebug.set('application', App);
     });
     run(EmberDebug, 'start');
+    await wait();
     objectInspector = EmberDebug.get('objectInspector');
     port = EmberDebug.port;
   },
@@ -184,14 +185,16 @@ test("Properties are correctly bound", function(assert) {
   let inspected = Ember.Object.extend({
     name: 'Teddy',
 
-    hi: computed(function(key, val) {
-      if (val !== undefined) {
+    hi: computed({
+      get() {
+        return 'hello';
+      },
+      set(key, val) {
         return val;
       }
-      return 'hello';
-    }).property(),
+    }),
 
-    _debugInfo: function() {
+    _debugInfo() {
       return {
         propertyInfo: {
           expensiveProperties: ['hi']
@@ -239,7 +242,6 @@ test("Properties are correctly bound", function(assert) {
   assert.ok(message.value.computed);
   assert.equal(message.value.inspect, 'Hello!');
   assert.equal(message.value.type, 'type-string');
-
 });
 
 test("Properties can be updated through a port message", function(assert) {

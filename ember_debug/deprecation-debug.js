@@ -156,7 +156,7 @@ export default EmberObject.extend(PortMixin, {
   },
 
   willDestroy() {
-    Ember.deprecate = this.originalDeprecate;
+    // Ember.deprecate = this.originalDeprecate;
     this.originalDeprecate = null;
     run.cancel(this.debounce);
     this._super();

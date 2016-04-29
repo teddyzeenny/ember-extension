@@ -1,27 +1,27 @@
 import Ember from "ember";
-const { computed } = Ember;
+const { computed, Controller } = Ember;
 const { equal, alias } = computed;
 
-export default Ember.ObjectController.extend({
+export default Controller.extend({
   isEdit: false,
 
   // Bound to editing textbox
   txtValue: null,
   dateValue: null,
 
-  isCalculated: computed('value.type', function() {
-    return this.get('value.type') !== 'type-descriptor';
+  isCalculated: computed('model.value.type', function() {
+    return this.get('model.value.type') !== 'type-descriptor';
   }),
 
-  isEmberObject: equal('value.type', 'type-ember-object'),
+  isEmberObject: equal('model.value.type', 'type-ember-object'),
 
-  isComputedProperty: alias('value.computed'),
+  isComputedProperty: alias('model.value.computed'),
 
-  isFunction: equal('value.type', 'type-function'),
+  isFunction: equal('model.value.type', 'type-function'),
 
-  isArray: equal('value.type', 'type-array'),
+  isArray: equal('model.value.type', 'type-array'),
 
-  isDate: equal('value.type', 'type-date'),
+  isDate: equal('model.value.type', 'type-date'),
 
   _parseTextValue(value) {
     let parsedValue;
@@ -51,12 +51,12 @@ export default Ember.ObjectController.extend({
         return;
       }
 
-      if (this.get('isFunction') || this.get('overridden') || this.get('readOnly')) {
+      if (this.get('isFunction') || this.get('model.overridden') || this.get('model.readOnly')) {
         return;
       }
 
-      let value = this.get('value.inspect');
-      let type = this.get('value.type');
+      let value = this.get('model.value.inspect');
+      let type = this.get('model.value.type');
       if (type === 'type-string') {
         value = '"' + value + '"';
       }
@@ -77,7 +77,7 @@ export default Ember.ObjectController.extend({
         realValue = this.get('dateValue').getTime();
         dataType = 'date';
       }
-      this.get('target').send('saveProperty', this.get('name'), realValue, dataType);
+      this.get('target').send('saveProperty', this.get('model.name'), realValue, dataType);
     },
 
     finishedEditing() {

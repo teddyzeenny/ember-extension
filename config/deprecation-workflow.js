@@ -13,5 +13,8 @@ window.deprecationWorkflow.config = {
   }, {
     handler: 'throw',
     matchMessage: /`lookup` was called on a Registry/
+  }, {
+    handler: 'throw',
+    matchMessage: /ObjectController/
   }]
 };

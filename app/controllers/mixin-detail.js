@@ -1,35 +1,35 @@
 import Ember from "ember";
-const { computed } = Ember;
-const { oneWay } = computed;
+const { computed, Controller } = Ember;
+const { readOnly } = computed;
 
-export default Ember.ObjectController.extend({
+export default Controller.extend({
   needs: ['mixin-details'],
 
-  mixinDetails: oneWay('controllers.mixin-details').readOnly(),
-  objectId: oneWay('mixinDetails.model.objectId').readOnly(),
+  mixinDetails: readOnly('controllers.mixin-details'),
+  objectId: readOnly('mixinDetails.model.objectId'),
 
   isExpanded: computed('model.expand', 'model.properties.length', function() {
     return this.get('model.expand') && this.get('model.properties.length') > 0;
   }),
 
   actions: {
-    calculate(property) {
+    calculate({ name }) {
       let objectId = this.get('objectId');
       let mixinIndex = this.get('mixinDetails.model.mixins').indexOf(this.get('model'));
 
       this.get('port').send('objectInspector:calculate', {
-        objectId: objectId,
-        property: property.name,
-        mixinIndex: mixinIndex
+        objectId,
+        mixinIndex,
+        property: name
       });
     },
 
-    sendToConsole(property) {
+    sendToConsole({ name }) {
       let objectId = this.get('objectId');
 
       this.get('port').send('objectInspector:sendToConsole', {
-        objectId: objectId,
-        property: property.name
+        objectId,
+        property: name
       });
     },
 
@@ -37,24 +37,24 @@ export default Ember.ObjectController.extend({
       this.toggleProperty('isExpanded');
     },
 
-    digDeeper(property) {
+    digDeeper({ name }) {
       let objectId = this.get('objectId');
 
       this.get('port').send('objectInspector:digDeeper', {
-        objectId: objectId,
-        property: property.name
+        objectId,
+        property: name
       });
     },
 
-    saveProperty(prop, val, type) {
+    saveProperty(property, value, dataType) {
       let mixinIndex = this.get('mixinDetails.model.mixins').indexOf(this.get('model'));
 
       this.get('port').send('objectInspector:saveProperty', {
         objectId: this.get('objectId'),
-        property: prop,
-        value: val,
-        mixinIndex: mixinIndex,
-        dataType: type
+        property,
+        value,
+        mixinIndex,
+        dataType
       });
     }
   }

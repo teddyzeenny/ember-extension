@@ -48,9 +48,12 @@ export default Ember.Component.extend({
   },
 
   style: computed('side', 'position', function () {
+    let string;
     if (this.get('side')) {
-      return new SafeString(`${this.get('side')}: ${this.get('position')}px;`);
+      string = `${this.get('side')}: ${this.get('position')}px;`;
+    } else {
+      string = '';
     }
-    return '';
+    return new SafeString(string);
   })
 });

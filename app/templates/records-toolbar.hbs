@@ -10,8 +10,8 @@
   <div class="divider"></div>
 
   {{#each filters itemController="recordFilter" as |filter|}}
-    <button data-label="filter" {{bind-attr class="filter.checked:active :toolbar__radio"}} {{action "setFilter" filter.name}} >
-      {{filter.desc}}
+    <button data-label="filter" class="{{if filter.checked 'active'}} toolbar__radio" {{action "setFilter" filter.model.name}} >
+      {{filter.model.desc}}
     </button>
   {{/each}}
 </div>

@@ -17,14 +17,15 @@ export default Component.extend({
 
   // TODO: Color record based on `color` property.
   style: computed('model.color', function() {
+    let string = '';
     let colorName = this.get('model.color');
     if (!isEmpty(colorName)) {
       let color = COLOR_MAP[colorName];
       if (color) {
-        return new SafeString(`color: ${color};`);
+        string = `color: ${color};`;
       }
     }
-    return '';
+    return new SafeString(string);
   }),
 
   columns: computed('modelTypeColumns.@each', 'model.columnValues', function() {

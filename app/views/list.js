@@ -1,7 +1,7 @@
 import Ember from 'ember';
 import ListItemView from 'ember-inspector/views/list-item';
 
-const { computed, computed: { alias } } = Ember;
+const { computed, computed: { alias }, Handlebars: { SafeString } } = Ember;
 
 /**
  * Base list view config
@@ -29,7 +29,7 @@ export default Ember.View.extend({
   attributeBindings: ['style'],
 
   style: computed('height', function() {
-    return `height:${this.get('height')}px`;
+    return new SafeString(`height:${this.get('height')}px`);
   }),
 
   /**

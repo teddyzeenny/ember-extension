@@ -1,10 +1,10 @@
 import Ember from "ember";
 import escapeRegExp from "ember-inspector/utils/escape-reg-exp";
-const { ObjectController, computed, isEmpty, run, on, observer, Handlebars: { SafeString } } = Ember;
+const { Controller, computed, isEmpty, run, on, observer, Handlebars: { SafeString } } = Ember;
 const { gt, readOnly } = computed;
 const { once } = run;
 
-export default ObjectController.extend({
+export default Controller.extend({
   needs: ['render-tree'],
 
   search: readOnly('controllers.render-tree.search'),
@@ -27,7 +27,7 @@ export default ObjectController.extend({
     if (isEmpty(search)) {
       return true;
     }
-    let name = this.get('name');
+    let name = this.get('model.name');
     let regExp = new RegExp(escapeRegExp(search.toLowerCase()));
     return !!name.toLowerCase().match(regExp);
   }),
@@ -50,7 +50,7 @@ export default ObjectController.extend({
     return new SafeString(`padding-left: ${+this.get('level') * 20 + 5}px;`);
   }),
 
-  hasChildren: gt('children.length', 0),
+  hasChildren: gt('model.children.length', 0),
 
   expandedClass: computed('hasChildren', 'isExpanded', function() {
     if (!this.get('hasChildren')) { return; }
@@ -62,8 +62,8 @@ export default ObjectController.extend({
     }
   }),
 
-  readableTime: computed('timestamp', function() {
-    let d = new Date(this.get('timestamp'));
+  readableTime: computed('model.timestamp', function() {
+    let d = new Date(this.get('model.timestamp'));
     let ms = d.getMilliseconds();
     let seconds = d.getSeconds();
     let minutes = d.getMinutes().toString().length === 1 ? '0' + d.getMinutes() : d.getMinutes();

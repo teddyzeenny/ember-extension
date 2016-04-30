@@ -16,5 +16,12 @@ window.deprecationWorkflow.config = {
   }, {
     handler: 'throw',
     matchMessage: /ObjectController/
+  }, {
+    handler: 'throw',
+    matchId: 'ember-htmlbars.handlebars-helper'
+  }, {
+    handler: 'throw',
+    matchMessage: /Ember\.keys/
   }]
+
 };

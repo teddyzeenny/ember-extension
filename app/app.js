@@ -6,7 +6,6 @@ import config from './config/environment';
 
 import Port from "./port";
 import PromiseAssembler from "ember-inspector/libs/promise-assembler";
-import msToTime from "ember-inspector/helpers/ms-to-time";
 
 Ember.MODEL_FACTORY_INJECTIONS = true;
 
@@ -18,11 +17,7 @@ const App = Ember.Application.extend({
   Resolver: Resolver
 });
 
-
 config.VERSION = version;
-
-// Register Helpers
-Ember.Handlebars.helper('ms-to-time', msToTime);
 
 // Inject adapter
 App.initializer({

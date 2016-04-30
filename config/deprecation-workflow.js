@@ -22,6 +22,12 @@ window.deprecationWorkflow.config = {
   }, {
     handler: 'throw',
     matchMessage: /Ember\.keys/
-  }]
-
+  }, {
+    handler: 'throw',
+    matchMessage: /Controller#needs/
+  }, {
+    handler: 'throw',
+    matchId: 'ember-runtime.array-controller'
+  }
+]
 };

@@ -1,9 +1,8 @@
 import Ember from "ember";
-const { computed, Controller } = Ember;
+const { computed, Controller, inject: { controller } } = Ember;
 export default Controller.extend({
-  needs: ['records'],
-
-  checked: computed('controllers.records.filterValue', 'model.name', function() {
-    return this.get('controllers.records.filterValue') === this.get('model.name');
+  records: controller(),
+  checked: computed('records.filterValue', 'model.name', function() {
+    return this.get('records.filterValue') === this.get('model.name');
   })
 });

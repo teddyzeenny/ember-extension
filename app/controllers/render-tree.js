@@ -7,8 +7,6 @@ const { and, equal, filter } = computed;
 const get = Ember.get;
 
 export default Controller.extend({
-  needs: ['application'],
-
   initialEmpty: false,
   modelEmpty: equal('model.length', 0),
   showEmpty: and('initialEmpty', 'modelEmpty'),

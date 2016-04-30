@@ -1,14 +1,16 @@
 import Ember from "ember";
-const { ArrayController, computed, run, observer } = Ember;
-const { alias, map } = computed;
+const { Controller, computed, run, observer } = Ember;
+const { alias } = computed;
 
-export default ArrayController.extend({
-  model: map('port.detectedApplications', function(item) {
-    let name = item.split('__');
-    return {
-      name: name[1],
-      val: item
-    };
+export default Controller.extend({
+  model: computed('port.detectedApplications.[]', function() {
+    return this.get('port.detectedApplications').map(item => {
+      let name = item.split('__');
+      return {
+        name: name[1],
+        val: item
+      };
+    });
   }),
 
   selectedApp: alias('port.applicationId'),

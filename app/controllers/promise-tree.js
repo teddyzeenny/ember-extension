@@ -1,7 +1,8 @@
 import Ember from "ember";
 import filterComputed from "ember-inspector/computed/custom-filter";
-const { computed, observer } = Ember;
+const { Controller, computed, observer, run } = Ember;
 const { equal, bool, and, not } = computed;
+const { next, once } = run;
 
 // Manual implementation of item controllers
 function itemProxyComputed(dependentKey, itemProxy) {
@@ -22,9 +23,7 @@ function itemProxyComputed(dependentKey, itemProxy) {
   return Ember.arrayComputed(dependentKey, options);
 }
 
-export default Ember.ArrayController.extend({
-  needs: ['application'],
-
+export default Controller.extend({
   queryParams: ['filter'],
 
   createdAfter: null,
@@ -113,29 +112,27 @@ export default Ember.ArrayController.extend({
   }),
 
   notifyChange() {
-    let self = this;
     this.set('effectiveSearch', this.get('search'));
-    Ember.run.next(function() {
-      self.notifyPropertyChange('model');
+    next(() => {
+      this.notifyPropertyChange('model');
     });
   },
 
   actions: {
     setFilter(filter) {
-      let self = this;
       this.set('filter', filter);
-      Ember.run.next(function() {
-        self.notifyPropertyChange('filtered');
+      Ember.run.next(() => {
+        this.notifyPropertyChange('filtered');
       });
     },
     clear() {
       this.set('createdAfter', new Date());
-      Ember.run.once(this, this.notifyChange);
+      once(this, this.notifyChange);
     },
     tracePromise(promise) {
       this.get('port').send('promise:tracePromise', { promiseId: promise.get('guid') });
     },
-    updateInstrumentWithStack: function(bool) {
+    updateInstrumentWithStack(bool) {
       this.port.send('promise:setInstrumentWithStack', { instrumentWithStack: bool });
     }
   }

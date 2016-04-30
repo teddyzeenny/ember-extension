@@ -1,14 +1,12 @@
 import Ember from "ember";
-const { computed: { readOnly, equal } } = Ember;
+const { computed: { readOnly, equal }, inject: { controller } } = Ember;
 
 export default Ember.Controller.extend({
-  needs: ['mixin-stack', 'mixin-details'],
-
   emberApplication: false,
   navWidth: 180,
   inspectorWidth: 360,
-  mixinStack: readOnly('controllers.mixin-stack'),
-  mixinDetails: readOnly('controllers.mixin-details'),
+  mixinStack: controller(),
+  mixinDetails: controller(),
   isChrome: equal('port.adapter.name', 'chrome'),
 
   deprecationCount: 0,
@@ -27,19 +25,19 @@ export default Ember.Controller.extend({
       errors
     };
 
-    this.get('mixinStack').pushObject(details);
+    this.get('mixinStack.model').pushObject(details);
     this.set('mixinDetails.model', details);
   },
 
   popMixinDetails() {
-    let mixinStack = this.get('controllers.mixin-stack');
+    let mixinStack = this.get('mixinStack.model');
     let item = mixinStack.popObject();
     this.set('mixinDetails.model', mixinStack.get('lastObject'));
     this.get('port').send('objectInspector:releaseObject', { objectId: item.objectId });
   },
 
   activateMixinDetails(name, objectId, details, errors) {
-    this.get('mixinStack').forEach(item => {
+    this.get('mixinStack.model').forEach(item => {
       this.get('port').send('objectInspector:releaseObject', { objectId: item.objectId });
     });
 

@@ -20,7 +20,7 @@ export default TabRoute.extend({
   },
 
   setTree(options) {
-    const routeArray = topSort(options.tree);
+    let routeArray = topSort(options.tree);
     this.set('controller.model', routeArray);
   },
 

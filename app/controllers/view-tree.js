@@ -1,9 +1,9 @@
 import Ember from "ember";
-const { computed, Controller, on, observer } = Ember;
+const { computed, Controller, on, observer, inject: { controller } } = Ember;
 const { alias } = computed;
 
 export default Controller.extend({
-  needs: ['application'],
+  application: controller(),
   pinnedObjectId: null,
   inspectingViews: false,
   queryParams: ['components', 'allViews'],

@@ -15,7 +15,9 @@
   </div>
 </div>
 {{/if}}
-{{#each model.mixins itemController="mixinDetail" as |mixin|}}
+length: {{model.mixins.length}}
+{{#each model.mixins itemController="mixin-detail" as |mixin|}}
+HERE
 <div class="mixin {{mixin.model.type}} {{if mixin.isExpanded 'mixin_state_expanded'}} {{if mixin.model.properties.length 'mixin_props_yes' 'mixin_props_no'}}" data-label="object-detail" >
   {{#if mixin.model.properties.length}}
     <h2 class="mixin__name" {{action "toggleExpanded" target="mixin"}} data-label="object-detail-name">{{mixin.model.name}}</h2>

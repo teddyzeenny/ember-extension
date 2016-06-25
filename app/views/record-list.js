@@ -21,14 +21,6 @@ export default ListView.extend({
      * @type {String}
      * @default 'record_item'
      */
-    templateName: 'record_item',
-
-    /**
-     * TODO: Need a better way to pass this
-     *
-     * @property columns
-     * @type {Array}
-     */
-    columns: readOnly('parentView.columns')
+    templateName: 'record_item'
   })
 });

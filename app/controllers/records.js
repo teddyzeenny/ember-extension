@@ -1,16 +1,19 @@
 import Ember from "ember";
 import escapeRegExp from "ember-inspector/utils/escape-reg-exp";
 const { Controller, computed, observer, inject: { controller } } = Ember;
-const { none, alias } = computed;
+const { none, readOnly } = computed;
 
 export default Controller.extend({
   application: controller(),
+
   queryParams: ['filterValue', 'search'],
 
-  columns: alias('modelType.columns'),
+  columns: readOnly('modelType.columns'),
 
   search: '',
+
   filters: computed(function() { return []; }),
+
   filterValue: null,
 
   noFilterValue: none('filterValue'),
@@ -36,8 +39,9 @@ export default Controller.extend({
   },
 
   filtered: computed('search', 'model.@each.columnValues', 'model.@each.filterValues', 'filterValue', function() {
+    console.log('invalid');
     let search = this.get('search'), filter = this.get('filterValue');
-    return this.get('model').filter(item => {
+    let a = this.get('model').filter(item => {
       // check filters
       if (filter && !Ember.get(item, 'filterValues.' + filter)) {
         return false;
@@ -50,5 +54,6 @@ export default Controller.extend({
       }
       return true;
     });
+    return a;
   })
 });

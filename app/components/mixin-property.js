@@ -1,9 +1,17 @@
 import Ember from "ember";
-const { computed, Controller } = Ember;
+const { computed, Component } = Ember;
 const { equal, alias } = computed;
 
-export default Controller.extend({
+export default Component.extend({
   isEdit: false,
+
+  /**
+   * Passed through the template.
+   * 
+   * The mixin=detail component
+   * @type {Ember.Component}
+   */
+  mixin: null,
 
   // Bound to editing textbox
   txtValue: null,
@@ -42,12 +50,12 @@ export default Controller.extend({
   actions: {
     valueClick() {
       if (this.get('isEmberObject') || this.get('isArray')) {
-        this.get('target').send('digDeeper', this.get('model'));
+        this.get('mixin').send('digDeeper', this.get('model'));
         return;
       }
 
       if (this.get('isComputedProperty') && !this.get('isCalculated')) {
-        this.get('target').send('calculate', this.get('model'));
+        this.get('mixin').send('calculate', this.get('model'));
         return;
       }
 
@@ -77,7 +85,7 @@ export default Controller.extend({
         realValue = this.get('dateValue').getTime();
         dataType = 'date';
       }
-      this.get('target').send('saveProperty', this.get('model.name'), realValue, dataType);
+      this.get('mixin').send('saveProperty', this.get('model.name'), realValue, dataType);
     },
 
     finishedEditing() {

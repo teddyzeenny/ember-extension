@@ -1,9 +1,16 @@
 import Ember from "ember";
-const { computed, Controller, inject: { controller } } = Ember;
+const { computed, Component, inject: { controller } } = Ember;
 const { readOnly } = computed;
 
-export default Controller.extend({
-  mixinDetails: controller(),
+export default Component.extend({
+  /**
+   * mixinDetails controller passed through the template
+   * 
+   * @property mixinDetails
+   * @type {Ember.Controller}
+   */
+  mixinDetails: null,
+
   objectId: readOnly('mixinDetails.model.objectId'),
 
   isExpanded: computed('model.expand', 'model.properties.length', function() {

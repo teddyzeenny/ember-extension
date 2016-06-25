@@ -15,43 +15,45 @@
   </div>
 </div>
 {{/if}}
-length: {{model.mixins.length}}
-{{#each model.mixins itemController="mixin-detail" as |mixin|}}
-HERE
-<div class="mixin {{mixin.model.type}} {{if mixin.isExpanded 'mixin_state_expanded'}} {{if mixin.model.properties.length 'mixin_props_yes' 'mixin_props_no'}}" data-label="object-detail" >
-  {{#if mixin.model.properties.length}}
-    <h2 class="mixin__name" {{action "toggleExpanded" target="mixin"}} data-label="object-detail-name">{{mixin.model.name}}</h2>
-  {{else}}
-    <h2 class="mixin__name" data-label="object-detail-name">{{mixin.model.name}}</h2>
-  {{/if}}
-  {{#if mixin.isExpanded}}
-  <ul class="mixin__properties">
-    {{#each mixin.model.properties itemController="mixinProperty" as |property|}}
-    <li class="{{if property.model.overridden 'mixin__property_state_overridden'}} mixin__property" data-label="object-property">
-      {{#if property.model.value.computed}}
-        <button class="mixin__calc-btn {{if property.isCalculated 'mixin__calc-btn_calculated'}}" {{action "calculate" property.model bubbles=false}} data-label="calculate"><img src="assets/images/calculate.svg"></button>
+{{#each model.mixins as |item|}}
+  {{#mixin-detail model=item mixinDetails=this as |mixin|}}
+    <div class="mixin {{mixin.model.type}} {{if mixin.isExpanded 'mixin_state_expanded'}} {{if mixin.model.properties.length 'mixin_props_yes' 'mixin_props_no'}}" data-label="object-detail" >
+      {{#if mixin.model.properties.length}}
+        <h2 class="mixin__name" {{action "toggleExpanded" target=mixin}} data-label="object-detail-name">{{mixin.model.name}}</h2>
       {{else}}
-        <span class='pad'></span>
+        <h2 class="mixin__name" data-label="object-detail-name">{{mixin.model.name}}</h2>
       {{/if}}
-      <span class='mixin__property-name' data-label="object-property-name">{{property.model.name}}</span><span class='mixin__property-value-separator'>: </span>
-      {{#unless property.isEdit}}
-        <span  {{action "valueClick" property.model}} class="{{property.value.type}} mixin__property-value" data-label="object-property-value">{{property.model.value.inspect}}</span>
-      {{else}}
-        {{#unless property.isDate}}
-          {{property-field value=property.txtValue finished-editing="finishedEditing" save-property="saveProperty"
-           class="mixin__property-value-txt" label="object-property-value-txt"}}
-        {{else}}
-          {{date-property-field value=property.dateValue format="YYYY-MM-DD" finished-editing="finishedEditing" save-property="saveProperty"
-           class="mixin__property-value-txt" label="object-property-value-date"}}
-        {{/unless}}
-      {{/unless}}
-      <span class='mixin__property-overridden-by'>(Overridden by {{property.model.overridden}})</span>
-      <button class="mixin__send-btn" {{action "sendToConsole" property.model}} data-label="send-to-console-btn"><img src="assets/images/send.png" title="Send to console"></button>
-    </li>
-    {{else}}
-      <li class="mixin__property">No Properties</li>
-    {{/each}}
-  </ul>
-  {{/if}}
-</div>
+      {{#if mixin.isExpanded}}
+        <ul class="mixin__properties">
+          {{#each mixin.model.properties as |prop|}}
+            {{#mixin-property model=prop mixin=mixin as |property|}}
+              <li class="{{if property.model.overridden 'mixin__property_state_overridden'}} mixin__property" data-label="object-property">
+                {{#if property.model.value.computed}}
+                  <button class="mixin__calc-btn {{if property.isCalculated 'mixin__calc-btn_calculated'}}" {{action "calculate" property.model bubbles=false target=property}} data-label="calculate"><img src="assets/images/calculate.svg"></button>
+                {{else}}
+                  <span class='pad'></span>
+                {{/if}}
+                <span class='mixin__property-name' data-label="object-property-name">{{property.model.name}}</span><span class='mixin__property-value-separator'>: </span>
+                {{#unless property.isEdit}}
+                  <span  {{action "valueClick" property.model target=property}} class="{{property.value.type}} mixin__property-value" data-label="object-property-value">{{property.model.value.inspect}}</span>
+                {{else}}
+                  {{#unless property.isDate}}
+                    {{property-field value=property.txtValue finished-editing="finishedEditing" save-property="saveProperty" propertyComponent=property
+                     class="mixin__property-value-txt" label="object-property-value-txt"}}
+                  {{else}}
+                    {{date-property-field value=property.dateValue format="YYYY-MM-DD" finished-editing="finishedEditing" save-property="saveProperty"
+                     class="mixin__property-value-txt" label="object-property-value-date"}}
+                  {{/unless}}
+                {{/unless}}
+                <span class='mixin__property-overridden-by'>(Overridden by {{property.model.overridden}})</span>
+                <button class="mixin__send-btn" {{action "sendToConsole" property.model target=property}} data-label="send-to-console-btn"><img src="assets/images/send.png" title="Send to console"></button>
+              </li>
+            {{/mixin-property}}
+          {{else}}
+            <li class="mixin__property">No Properties</li>
+          {{/each}}
+        </ul>
+      {{/if}}
+    </div>
+  {{/mixin-detail}}
 {{/each}}

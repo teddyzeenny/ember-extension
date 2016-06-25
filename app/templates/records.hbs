@@ -9,6 +9,13 @@
   </div>
 
   <div class="list-view__list-container">
-    {{view "record-list" content=filtered columns=columns controller=this}}
+    <div class="ember-list-container">
+      {{#each filtered as |item|}}
+        {{!-- passing columns for record-item only (will be fixed in next upgrade) --}}
+        {{view view.itemViewClass content=item columns=columns}}
+      {{/each}}
+    </div>
+    {{!-- {{view "record-list" content=filtered columns=columns controller=this}} --}}
   </div>
 </div>
+{{#each filtered as |fil|}}{{/each}}

@@ -1,5 +1,6 @@
 <div class="ember-list-container">
   {{#each view.content as |item|}}
-    {{view view.itemViewClass content=item}}
+    {{!-- passing columns for record-item only (will be fixed in next upgrade) --}}
+    {{view view.itemViewClass content=item columns=columns}}
   {{/each}}
 </div>

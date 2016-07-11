@@ -39,7 +39,7 @@ export default TabRoute.extend({
 
     traceDeprecations(deprecation) {
       this.get('port').send('deprecation:sendStackTraces', {
-        deprecation: deprecation
+        deprecation
       });
     },
 

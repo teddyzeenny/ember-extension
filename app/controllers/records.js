@@ -42,7 +42,7 @@ export default Controller.extend({
   filtered: computed('search', 'model.@each.columnValues', 'model.@each.filterValues', 'filterValue', function() {
     let search = this.get('search');
     let filter = this.get('filterValue');
-    let a = this.get('model').filter(item => {
+    return this.get('model').filter(item => {
       // check filters
       if (filter && !get(item, 'filterValues.' + filter)) {
         return false;
@@ -55,6 +55,5 @@ export default Controller.extend({
       }
       return true;
     });
-    return a;
   })
 });

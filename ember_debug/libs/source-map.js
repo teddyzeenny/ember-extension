@@ -116,7 +116,12 @@ function retrieveSourceMapURL(source) {
   return retrieveFile(source).then(function(fileData) {
     const match = /\/\/[#@]\s*sourceMappingURL=(.*)\s*$/m.exec(fileData);
     if (!match) { return null; }
-    return match[1];
+    let url = match[1];
+    // check not data URL
+    if (url.match(/^data/)) {
+      return null;
+    }
+    return url;
   });
 }
 

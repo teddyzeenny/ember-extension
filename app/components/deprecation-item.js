@@ -1,8 +1,8 @@
 import Ember from "ember";
-const { Controller, computed } = Ember;
+const { Component, computed } = Ember;
 const { notEmpty } = computed;
 
-export default Controller.extend({
+export default Component.extend({
   isExpanded: true,
 
   hasMap: notEmpty('model.hasSourceMap'),

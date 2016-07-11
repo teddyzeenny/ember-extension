@@ -1,5 +1,6 @@
 import Ember from "ember";
 const { View, computed, Handlebars: { SafeString } } = Ember;
+const { readOnly } = computed;
 
 export default View.extend({
   attributeBindings: ['style'],
@@ -10,7 +11,7 @@ export default View.extend({
     return new SafeString(`height: ${this.get('height')}px;`);
   }),
 
-  contentHeight: Ember.computed.alias('controller.controllers.application.contentHeight'),
+  contentHeight: readOnly('controller.application.contentHeight'),
 
   filterHeight: 22,
 

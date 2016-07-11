@@ -23,6 +23,12 @@
   </div>
 
   <div class="list-view__list-container">
-    {{view "view-list" content=model pinnedObjectId=pinnedObjectId controller=this}}
+    {{#view-list owner=this pinnedObjectId=pinnedObjectId}}
+      <div class="ember-list-container">
+        {{#each model as |item|}}
+          {{view "view-item" content=item controller=this}}
+        {{/each}}
+      </div>
+    {{/view-list}}
   </div>
 </div>

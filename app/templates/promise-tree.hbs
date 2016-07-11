@@ -20,7 +20,9 @@
   </div>
 
   <div class="list-view__list-container">
-    {{view "promiseList" content=items}}
+    {{#each items as |item|}}
+      {{view "promise-item" content=item}}
+    {{/each}}
   </div>
 </div>
 {{/if}}

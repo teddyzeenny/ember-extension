@@ -10,12 +10,17 @@
 
   <div class="list-view__list-container">
     <div class="ember-list-container">
-      {{#each filtered as |item|}}
-        {{!-- passing columns for record-item only (will be fixed in next upgrade) --}}
-        {{view view.itemViewClass content=item columns=columns}}
+      {{#each filtered as |content|}}
+        <div class="list-tree__item-wrapper row-wrapper">
+          {{#record-item model=content modelTypeColumns=columns inspect="inspectModel" as |item|}}
+            {{#each column in item.columns}}
+              <div class="cell cell_clickable" data-label="record-column" style={{item.style}}>
+                {{column.value}}
+              </div>
+            {{/each}}
+          {{/record-item}}
+        </div>
       {{/each}}
     </div>
-    {{!-- {{view "record-list" content=filtered columns=columns controller=this}} --}}
   </div>
 </div>
-{{#each filtered as |fil|}}{{/each}}

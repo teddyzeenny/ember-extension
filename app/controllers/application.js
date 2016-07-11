@@ -1,5 +1,5 @@
 import Ember from "ember";
-const { computed: { readOnly, equal }, inject: { controller } } = Ember;
+const { computed: { equal }, inject: { controller } } = Ember;
 
 export default Ember.Controller.extend({
   emberApplication: false,

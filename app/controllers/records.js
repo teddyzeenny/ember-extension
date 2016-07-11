@@ -2,6 +2,7 @@ import Ember from "ember";
 import escapeRegExp from "ember-inspector/utils/escape-reg-exp";
 const { Controller, computed, observer, inject: { controller } } = Ember;
 const { none, readOnly } = computed;
+const get = Ember.get;
 
 export default Controller.extend({
   application: controller(),
@@ -12,14 +13,14 @@ export default Controller.extend({
 
   search: '',
 
-  filters: computed(function() { return []; }),
+  filters: computed(() => []),
 
   filterValue: null,
 
   noFilterValue: none('filterValue'),
 
   actions: {
-    setFilter: function(val) {
+    setFilter(val) {
       val = val || null;
       this.set('filterValue', val);
     }
@@ -31,19 +32,19 @@ export default Controller.extend({
 
   recordToString(record) {
     let search = '';
-    let searchKeywords = Ember.get(record, 'searchKeywords');
+    let searchKeywords = get(record, 'searchKeywords');
     if (searchKeywords) {
-      search = Ember.get(record, 'searchKeywords').join(' ');
+      search = get(record, 'searchKeywords').join(' ');
     }
     return search.toLowerCase();
   },
 
   filtered: computed('search', 'model.@each.columnValues', 'model.@each.filterValues', 'filterValue', function() {
-    console.log('invalid');
-    let search = this.get('search'), filter = this.get('filterValue');
+    let search = this.get('search');
+    let filter = this.get('filterValue');
     let a = this.get('model').filter(item => {
       // check filters
-      if (filter && !Ember.get(item, 'filterValues.' + filter)) {
+      if (filter && !get(item, 'filterValues.' + filter)) {
         return false;
       }
 

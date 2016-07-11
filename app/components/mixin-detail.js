@@ -1,11 +1,11 @@
 import Ember from "ember";
-const { computed, Component, inject: { controller } } = Ember;
+const { computed, Component } = Ember;
 const { readOnly } = computed;
 
 export default Component.extend({
   /**
    * mixinDetails controller passed through the template
-   * 
+   *
    * @property mixinDetails
    * @type {Ember.Controller}
    */

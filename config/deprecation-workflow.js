@@ -28,6 +28,9 @@ window.deprecationWorkflow.config = {
   }, {
     handler: 'throw',
     matchId: 'ember-runtime.array-controller'
+  }, {
+    handler: 'silence',
+    matchId: 'ember-views.view-deprecated'
   }
 ]
 };

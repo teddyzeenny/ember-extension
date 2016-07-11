@@ -1,8 +1,5 @@
-import Ember from 'ember';
 import ListView from 'ember-inspector/views/list';
 import ListItemView from 'ember-inspector/views/list-item';
-
-const { computed: { readOnly } } = Ember;
 
 /**
  * @module Views
@@ -19,8 +16,8 @@ export default ListView.extend({
     /**
      * @property templateName
      * @type {String}
-     * @default 'record_item'
+     * @default 'record-item'
      */
-    templateName: 'record_item'
+    templateName: 'record-item'
   })
 });

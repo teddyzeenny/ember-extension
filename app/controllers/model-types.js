@@ -12,7 +12,7 @@ export default Controller.extend({
   },
 
   sorted: sort('filtered', 'sortProperties'),
-
+  
   filtered: computed('model.@each.count', 'options.hideEmptyModelTypes', function() {
     return this.get('model').filter(item => {
       let hideEmptyModels = get(this, 'options.hideEmptyModelTypes');

@@ -10,17 +10,19 @@
 
   <div class="list-view__list-container">
     <div class="ember-list-container">
-      {{#each filtered as |content|}}
-        <div class="list-tree__item-wrapper row-wrapper">
-          {{#record-item model=content modelTypeColumns=columns inspect="inspectModel" as |item|}}
-            {{#each column in item.columns}}
-              <div class="cell cell_clickable" data-label="record-column" style={{item.style}}>
-                {{column.value}}
-              </div>
-            {{/each}}
-          {{/record-item}}
-        </div>
-      {{/each}}
+      {{#record-list owner=this}}
+        {{#each filtered as |content|}}
+          {{#view "record-item" controller=this}}
+            {{#record-item model=content modelTypeColumns=columns inspect="inspectModel" as |item|}}
+              {{#each column in item.columns}}
+                <div class="cell cell_clickable" data-label="record-column" style={{item.style}}>
+                  {{column.value}}
+                </div>
+              {{/each}}
+            {{/record-item}}
+          {{/view}}
+        {{/each}}
+      {{/record-list}}
     </div>
   </div>
 </div>

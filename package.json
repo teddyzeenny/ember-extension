@@ -63,6 +63,7 @@
     "ember-cli-qunit": "0.3.9",
     "ember-cli-uglify": "1.0.1",
     "ember-export-application-global": "^1.0.2",
+    "ember-getowner-polyfill": "^1.0.1",
     "ember-pikaday": "^0.2.1",
     "eslint-config-ember": "0.2.0",
     "fstream": "^1.0.8",

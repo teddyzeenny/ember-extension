@@ -15,7 +15,7 @@ export default ListItemView.extend({
    * @type {String}
    * @default 'view_item'
    */
-  templateName: 'view_item',
+  templateName: 'view-item',
 
   /**
    * @property node

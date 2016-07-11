@@ -20,6 +20,12 @@
   </div>
 
   <div class="list-view__list-container">
-    {{view "routeList" content=filtered currentRoute=currentRoute controller=this}}
+    {{#route-list owner=this}}
+      <div class="ember-list-container">
+        {{#each filtered as |item|}}
+          {{view "route-item" content=item currentRoute=currentRoute controller=this}}
+        {{/each}}
+      </div>
+    {{/route-list}}
   </div>
 </div>

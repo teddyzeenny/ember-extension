@@ -42,7 +42,7 @@ export default Component.extend({
 
   level: computed('target.level', function() {
     let parentLevel = this.get('target.level');
-    if (parentLevel === undefined) {
+    if (parentLevel == null) {
       parentLevel = -1;
     }
     return parentLevel + 1;

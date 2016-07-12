@@ -1,5 +1,5 @@
 import Ember from "ember";
-const { computed, Handlebars: { SafeString } } = Ember;
+const { computed, String: { htmlSafe } } = Ember;
 const { alias, notEmpty, empty, gt, equal } = computed;
 
 const COLOR_MAP = {
@@ -29,7 +29,7 @@ export default Ember.ObjectProxy.extend({
     } else {
       color = 'blue';
     }
-    return new SafeString(`background-color: ${COLOR_MAP[color]}; color: white;`);
+    return htmlSafe(`background-color: ${COLOR_MAP[color]}; color: white;`);
   }),
 
 
@@ -52,12 +52,14 @@ export default Ember.ObjectProxy.extend({
       relevant = this.get('model').matchesExactly(this.get('effectiveSearch'));
     }
     if (!relevant) {
-      return new SafeString('opacity: 0.3;');
+      return htmlSafe('opacity: 0.3;');
+    } else {
+      return htmlSafe('');
     }
   }),
 
   labelStyle: computed('level', function() {
-    return new SafeString(`padding-left: ${+this.get('level') * 20 + 5}px;`);
+    return htmlSafe(`padding-left: ${+this.get('level') * 20 + 5}px;`);
   }),
 
   expandedClass: computed('hasChildren', 'isExpanded', function() {

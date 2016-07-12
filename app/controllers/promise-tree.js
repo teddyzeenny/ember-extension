@@ -43,7 +43,11 @@ export default Controller.extend({
     this._super(...arguments);
     // List-view does not support item controllers
     this.reopen({
-      items: itemProxyComputed('filtered', this.get('promiseItemController'))
+      items: computed('filtered.[]', function() {
+        return this.get('filtered').map(content => {
+          return this.get('promiseItemController').create({ content });
+        });
+      })
     });
   },
 

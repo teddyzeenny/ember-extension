@@ -1,7 +1,6 @@
 import Ember from "ember";
-import filterComputed from "ember-inspector/computed/custom-filter";
 const { Controller, computed, observer, run, inject: { controller } } = Ember;
-const { equal, bool, and, not } = computed;
+const { equal, bool, and, not, filter } = computed;
 const { next, once } = run;
 
 // Manual implementation of item controllers
@@ -53,8 +52,7 @@ export default Controller.extend({
   }),
 
   /* jscs:disable validateIndentation */
-  // TODO: This filter can be further optimized
-  filtered: filterComputed(
+  filtered: filter(
     'model.@each.{createdAt,fulfilledBranch,rejectedBranch,pendingBranch,isVisible}', function(item) {
 
       // exclude cleared promises

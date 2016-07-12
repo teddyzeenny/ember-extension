@@ -1,5 +1,5 @@
 import Ember from "ember";
-const { computed, Component, inject: { controller } } = Ember;
+const { computed, Component } = Ember;
 export default Component.extend({
   filterValue: null,
   checked: computed('filterValue', 'model.name', function() {

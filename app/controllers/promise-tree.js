@@ -1,6 +1,6 @@
 import Ember from "ember";
 import filterComputed from "ember-inspector/computed/custom-filter";
-const { Controller, computed, observer, run } = Ember;
+const { Controller, computed, observer, run, inject: { controller } } = Ember;
 const { equal, bool, and, not } = computed;
 const { next, once } = run;
 
@@ -24,6 +24,8 @@ function itemProxyComputed(dependentKey, itemProxy) {
 }
 
 export default Controller.extend({
+  application: controller(),
+  
   queryParams: ['filter'],
 
   createdAfter: null,

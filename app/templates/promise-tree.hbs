@@ -20,11 +20,13 @@
   </div>
 
   <div class="list-view__list-container">
-    {{#view "promise-list" controller=this}}
-      {{#each items as |item|}}
-        {{view "promise-item" content=item}}
-      {{/each}}
-    {{/view}}
+    {{#promise-list owner=this}}
+      <div class="ember-list-container">
+        {{#each items as |item|}}
+          {{view "promise-item" content=item controller=this}}
+        {{/each}}
+      </div>
+    {{/promise-list}}
   </div>
 </div>
 {{/if}}

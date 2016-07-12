@@ -1,13 +1,13 @@
-import Ember from "ember";
+import Ember from 'ember';
 import escapeRegExp from "ember-inspector/utils/escape-reg-exp";
-const { Controller, computed, isEmpty, run, on, observer, Handlebars: { SafeString }, inject: { controller } } = Ember;
+const { Component, computed, isEmpty, run, on, observer, Handlebars: { SafeString } } = Ember;
 const { gt, readOnly } = computed;
 const { once } = run;
 
-export default Controller.extend({
-  renderTree: controller(),
+export default Component.extend({
+  owner: null,
 
-  search: readOnly('renderTree.search'),
+  search: readOnly('owner.search'),
 
   isExpanded: false,
 
@@ -77,5 +77,4 @@ export default Controller.extend({
       this.toggleProperty('isExpanded');
     }
   }
-
 });

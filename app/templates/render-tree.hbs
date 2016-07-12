@@ -12,11 +12,11 @@
   </div>
 
   <div class="ember-list-container">
-    {{#view "render-list"}}
+    {{#render-list owner=this}}
       {{#each filtered as |item|}}
-        {{render "render-item" item}}
+        {{render-item model=item owner=this}}
       {{/each}}
-    {{/view}}
+    {{/render-list}}
   </div>
 </div>
 {{else}}
@@ -24,6 +24,5 @@
     <p>No rendering metrics have been collected. Try reloading or navigating around your application.</p>
     <p><strong>Note:</strong> Very fast rendering times (&lt;1ms) are excluded.</p>
     <button data-label="toolbar-page-refresh-btn" {{action "refreshPage"}}>Reload</button>
-
   </div>
 {{/unless}}

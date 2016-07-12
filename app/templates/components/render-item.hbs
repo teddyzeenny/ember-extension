@@ -15,6 +15,6 @@
 </div>
 {{#if isExpanded}}
   {{#each model.children as |child|}}
-    {{render "render_item" child}}
+    {{render-item model=child owner=owner target=this}}
   {{/each}}
 {{/if}}

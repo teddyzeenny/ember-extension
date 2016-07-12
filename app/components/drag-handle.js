@@ -1,5 +1,5 @@
 import Ember from "ember";
-const { computed, Handlebars: { SafeString } } = Ember;
+const { computed, String: { htmlSafe } } = Ember;
 export default Ember.Component.extend({
   classNames: ['drag-handle'],
   classNameBindings: ['isLeft:drag-handle--left', 'isRight:drag-handle--right', 'class'],
@@ -54,6 +54,6 @@ export default Ember.Component.extend({
     } else {
       string = '';
     }
-    return new SafeString(string);
+    return htmlSafe(string);
   })
 });

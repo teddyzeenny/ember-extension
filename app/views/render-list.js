@@ -1,5 +1,5 @@
 import Ember from "ember";
-const { View, computed, Handlebars: { SafeString } } = Ember;
+const { View, computed, String: { htmlSafe } } = Ember;
 const { readOnly } = computed;
 
 export default View.extend({
@@ -8,7 +8,7 @@ export default View.extend({
   classNames: ["list-tree", "list-tree_scrollable"],
 
   style: computed('height', function() {
-    return new SafeString(`height: ${this.get('height')}px;`);
+    return htmlSafe(`height: ${this.get('height')}px;`);
   }),
 
   contentHeight: readOnly('controller.application.contentHeight'),

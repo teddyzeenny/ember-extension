@@ -1,5 +1,5 @@
 import Ember from 'ember';
-const { Component, computed, Handlebars: { SafeString }, isEmpty } = Ember;
+const { Component, computed, String: { htmlSafe }, isEmpty } = Ember;
 const COLOR_MAP = {
   red: '#ff2717',
   blue: '#174fff',
@@ -25,7 +25,7 @@ export default Component.extend({
         string = `color: ${color};`;
       }
     }
-    return new SafeString(string);
+    return htmlSafe(string);
   }),
 
   columns: computed('modelTypeColumns.[]', 'model.columnValues', function() {

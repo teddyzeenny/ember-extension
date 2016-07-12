@@ -5,7 +5,7 @@ const { Controller, computed, inject: { controller } } = Ember;
 
 export default Controller.extend({
   application: controller(),
-  
+
   currentRoute: null,
 
   options: {

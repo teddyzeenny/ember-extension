@@ -3,25 +3,6 @@ const { Controller, computed, observer, run, inject: { controller } } = Ember;
 const { equal, bool, and, not, filter } = computed;
 const { next, once } = run;
 
-// Manual implementation of item controllers
-function itemProxyComputed(dependentKey, itemProxy) {
-  let options = {
-    addedItem(array, item, changeMeta) {
-      let proxy = itemProxy.create({ content: item });
-      array.insertAt(changeMeta.index, proxy);
-      return array;
-    },
-    removedItem(array, item, changeMeta) {
-      let proxy = array.objectAt(changeMeta.index);
-      array.removeAt(changeMeta.index, 1);
-      proxy.destroy();
-      return array;
-    }
-  };
-
-  return Ember.arrayComputed(dependentKey, options);
-}
-
 export default Controller.extend({
   application: controller(),
 

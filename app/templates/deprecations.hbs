@@ -24,26 +24,28 @@
         </div>
         {{#if item.isExpanded}}
         {{#if item.model.hasSourceMap}}
-          {{#each source in item.model.sources itemController="deprecation-source"}}
-            <div class="list-tree__item-wrapper row-wrapper" data-label="deprecation-source">
-              <div class="list-tree__item row">
-                <div class="cell_type_main cell cell_size_larger" style="padding-left:48px">
-                  <span class="source">
-                  {{#if source.isClickable}}
-                    <a data-label="deprecation-source-link" href="#" {{action "openResource" source.model.map}}>{{source.url}}</a>
-                  {{else}}
-                    <span data-label="deprecation-source-text">{{source.url}}</span>
-                  {{/if}}
-                  </span>
-                </div>
-                <div class="cell">
-                  &nbsp; &nbsp;
-                  <span class="send-trace-to-console" {{action "traceSource" item.model source}} title="Trace deprecations in console" data-label="trace-deprecations-btn">
-                    Trace in the console
-                  </span>
+          {{#each item.model.sources as |single|}}
+            {{#deprecation-item-source model=single as |source|}}
+              <div class="list-tree__item-wrapper row-wrapper" data-label="deprecation-source">
+                <div class="list-tree__item row">
+                  <div class="cell_type_main cell cell_size_larger" style="padding-left:48px">
+                    <span class="source">
+                    {{#if source.isClickable}}
+                      <a data-label="deprecation-source-link" href="#" {{action "openResource" source.model.map}}>{{source.url}}</a>
+                    {{else}}
+                      <span data-label="deprecation-source-text">{{source.url}}</span>
+                    {{/if}}
+                    </span>
+                  </div>
+                  <div class="cell">
+                    &nbsp; &nbsp;
+                    <span class="send-trace-to-console" {{action "traceSource" item.model source}} title="Trace deprecations in console" data-label="trace-deprecations-btn">
+                      Trace in the console
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
+            {{/deprecation-item-source}}
           {{/each}}
         {{else}}
           <div class="list-tree__item-wrapper row-wrapper" data-label="deprecation-full-trace">

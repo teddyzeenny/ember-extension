@@ -1,8 +1,8 @@
-import Ember from "ember";
-const { Controller, computed } = Ember;
+import Ember from 'ember';
+const { computed } = Ember;
 const { bool, readOnly, and } = computed;
 
-export default Controller.extend({
+export default Ember.Component.extend({
   known: bool('model.map.source'),
 
   url: computed('model.map.source', 'model.map.line', 'known', function() {

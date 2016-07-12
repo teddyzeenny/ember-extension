@@ -7,7 +7,7 @@ export default Component.extend({
 
   /**
    * Passed through the template.
-   * 
+   *
    * The mixin=detail component
    * @type {Ember.Component}
    */

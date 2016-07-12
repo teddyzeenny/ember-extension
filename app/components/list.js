@@ -1,6 +1,6 @@
 import Ember from 'ember';
 
-const { Component, computed, computed: { readOnly }, Handlebars: { SafeString } } = Ember;
+const { Component, computed, computed: { readOnly }, String: { htmlSafe } } = Ember;
 
 /**
  * Base list view config
@@ -35,7 +35,7 @@ export default Component.extend({
   attributeBindings: ['style'],
 
   style: computed('height', function() {
-    return new SafeString(`height:${this.get('height')}px`);
+    return htmlSafe(`height:${this.get('height')}px`);
   }),
 
   /**

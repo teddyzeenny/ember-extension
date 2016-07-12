@@ -1,6 +1,6 @@
 import Ember from 'ember';
 import escapeRegExp from "ember-inspector/utils/escape-reg-exp";
-const { Component, computed, isEmpty, run, on, observer, Handlebars: { SafeString } } = Ember;
+const { Component, computed, isEmpty, run, on, observer, String: { htmlSafe } } = Ember;
 const { gt, readOnly } = computed;
 const { once } = run;
 
@@ -33,9 +33,11 @@ export default Component.extend({
   }),
 
   nodeStyle: computed('searchMatch', function() {
+    let style = '';
     if (!this.get('searchMatch')) {
-      return new SafeString('opacity: 0.5;');
+      style = 'opacity: 0.5;';
     }
+    return htmlSafe(style);
   }),
 
   level: computed('target.level', function() {
@@ -47,7 +49,7 @@ export default Component.extend({
   }),
 
   nameStyle: computed('level', function() {
-    return new SafeString(`padding-left: ${+this.get('level') * 20 + 5}px;`);
+    return htmlSafe(`padding-left: ${+this.get('level') * 20 + 5}px;`);
   }),
 
   hasChildren: gt('model.children.length', 0),

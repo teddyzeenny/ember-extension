@@ -9,22 +9,22 @@ export default function filterComputed() {
   }
   let options = {
     initialize(array, changeMeta, instanceMeta) {
-      instanceMeta.filteredArrayIndexes = Ember.A([]);
+      instanceMeta.filteredArrayIndexes = new Ember.SubArray();
     },
 
     addedItem(array, item, changeMeta, instanceMeta) {
       let match = !!callback.call(this, item);
-      instanceMeta.filteredArrayIndexes[changeMeta.index] = match;
+      let filterIndex = instanceMeta.filteredArrayIndexes.addItem(changeMeta.index, match);
 
       if (match) {
-        array.insertAt(changeMeta.index, item);
+        array.insertAt(filterIndex, item);
       }
 
       return array;
     },
 
     removedItem(array, item, changeMeta, instanceMeta) {
-      let filterIndex = instanceMeta.filteredArrayIndexes.removeAt(changeMeta.index);
+      let filterIndex = instanceMeta.filteredArrayIndexes.removeItem(changeMeta.index);
 
       if (filterIndex > -1) {
         array.removeAt(filterIndex);

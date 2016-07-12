@@ -29,7 +29,7 @@
             {{#mixin-property model=prop mixin=mixin as |property|}}
               <li class="{{if property.model.overridden 'mixin__property_state_overridden'}} mixin__property" data-label="object-property">
                 {{#if property.model.value.computed}}
-                  <button class="mixin__calc-btn {{if property.isCalculated 'mixin__calc-btn_calculated'}}" {{action "calculate" property.model bubbles=false target=property}} data-label="calculate"><img src="assets/images/calculate.svg"></button>
+                  <button class="mixin__calc-btn {{if property.isCalculated 'mixin__calc-btn_calculated'}}" {{action "calculate" property.model bubbles=false target=mixin}} data-label="calculate"><img src="assets/images/calculate.svg"></button>
                 {{else}}
                   <span class='pad'></span>
                 {{/if}}
@@ -41,12 +41,12 @@
                     {{property-field value=property.txtValue finished-editing="finishedEditing" save-property="saveProperty" propertyComponent=property
                      class="mixin__property-value-txt" label="object-property-value-txt"}}
                   {{else}}
-                    {{date-property-field value=property.dateValue format="YYYY-MM-DD" finished-editing="finishedEditing" save-property="saveProperty"
+                    {{date-property-field value=property.dateValue format="YYYY-MM-DD" finished-editing="finishedEditing" save-property="saveProperty" propertyComponent=property
                      class="mixin__property-value-txt" label="object-property-value-date"}}
                   {{/unless}}
                 {{/unless}}
                 <span class='mixin__property-overridden-by'>(Overridden by {{property.model.overridden}})</span>
-                <button class="mixin__send-btn" {{action "sendToConsole" property.model target=property}} data-label="send-to-console-btn"><img src="assets/images/send.png" title="Send to console"></button>
+                <button class="mixin__send-btn" {{action "sendToConsole" property.model target=mixin}} data-label="send-to-console-btn"><img src="assets/images/send.png" title="Send to console"></button>
               </li>
             {{/mixin-property}}
           {{else}}

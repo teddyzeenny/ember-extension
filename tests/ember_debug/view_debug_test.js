@@ -37,6 +37,13 @@ function setupApp() {
     this.resource('posts');
   });
 
+  App.ApplicationView = View.extend();
+  App.ApplicationView.reopenClass({
+    toString() {
+      return 'App.ApplicationView';
+    }
+  });
+
   App.SimpleRoute = Route.extend({
     model: function() {
       return EmberObject.create({
@@ -75,7 +82,7 @@ function setupApp() {
   });
 
   setTemplate('application', '{{outlet}}');
-  setTemplate('simple', 'Simple {{input class="simple-input"}} {{view "select" classNames="simple-view"}}');
+  setTemplate('simple', 'Simple {{input class="simple-input"}}');
   setTemplate('comments/index', '{{#each}}{{this}}{{/each}}');
   setTemplate('posts', 'Posts');
 }
@@ -90,6 +97,7 @@ module("View Debug", {
       setupApp();
       EmberDebug.set('application', App);
     });
+    EmberDebug.IGNORE_DEPRECATIONS = true;
     run(EmberDebug, 'start');
     port = EmberDebug.port;
   },
@@ -116,7 +124,7 @@ test("Simple View Tree", async function t(assert) {
   let value = tree.value;
   assert.equal(tree.children.length, 1);
   assert.equal(value.controller.name, 'Ember.Controller');
-  assert.equal(value.viewClass, 'Ember.View');
+  assert.equal(value.viewClass, 'App.ApplicationView');
   assert.equal(value.name, 'application');
   assert.equal(value.tagName, 'div');
   assert.equal(value.template, 'application');
@@ -129,30 +137,6 @@ test("Simple View Tree", async function t(assert) {
   assert.equal(childValue.tagName, 'div');
   assert.equal(childValue.template, 'simple');
 });
-
-
-test("Views created by context switching {{each}} helper are shown", async function t(assert) {
-  let message = null;
-  port.reopen({
-    send(n, m) {
-      message = m;
-    }
-  });
-
-  // Disable deprecation warning of context switching each helper
-  const originalDeprecate = Ember.deprecate;
-  Ember.deprecate = Ember.K;
-  await visit('/comments');
-
-  Ember.deprecate = originalDeprecate;
-  let tree = message.tree;
-  let comments = tree.children[0].children;
-  assert.equal(comments.length, 3, "There should be 3 views");
-  assert.equal(comments[0].value.model.name, 'first comment');
-  assert.equal(comments[1].value.model.name, 'second comment');
-  assert.equal(comments[2].value.model.name, 'third comment');
-});
-
 
 test("Highlight a view", async function t(assert) {
   let name, message, layerDiv;
@@ -171,7 +155,6 @@ test("Highlight a view", async function t(assert) {
   await wait();
   layerDiv = findByLabel('layer-div');
   assert.ok(layerDiv.is(':visible'));
-  assert.equal(findByLabel('layer-template', layerDiv).text(), 'simple');
   assert.equal(findByLabel('layer-controller', layerDiv).text(), 'App.SimpleController');
   assert.equal(findByLabel('layer-model', layerDiv).text(), 'Simple Model');
   assert.equal(findByLabel('layer-view', layerDiv).text(), 'App.SimpleView');
@@ -239,7 +222,6 @@ test("Highlighting Views on hover", async function t(assert) {
   assert.equal(findByLabel('layer-component').length, 0, "Components are not Highlighted by default");
   assert.equal(findByLabel('layer-controller', previewDiv).text(), 'App.SimpleController');
   assert.equal(findByLabel('layer-model', previewDiv).text(), 'Simple Model');
-  assert.equal(findByLabel('layer-template', previewDiv).text(), 'simple');
   assert.equal(findByLabel('layer-view', previewDiv).text(), 'App.SimpleView');
   run(() => port.trigger('view:setOptions', { options: { components: true } }));
   await wait();
@@ -252,28 +234,6 @@ test("Highlighting Views on hover", async function t(assert) {
   assert.equal(findByLabel('layer-component').text().trim(), "Ember.TextField");
   assert.equal(findByLabel('layer-controller', previewDiv).length, 0);
   assert.equal(findByLabel('layer-model', previewDiv).length, 0);
-
-  run(() => find('.simple-view').trigger('mousemove'));
-  await wait();
-
-  previewDiv = findByLabel('preview-div');
-  assert.equal(findByLabel('layer-view', previewDiv).text(), 'App.SimpleView', "Views without a controller are not highlighted by default.");
-  run(() => port.trigger('view:setOptions', { options: { allViews: true } }));
-  await wait();
-
-  find('.simple-view').trigger('mousemove');
-  await wait();
-
-  previewDiv = findByLabel('preview-div');
-  assert.equal(findByLabel('layer-view', previewDiv).text(), 'Ember.Select', "Views without controllers can be configured to be highlighted.");
-  run(() => port.trigger('view:inspectViews', { inspect: false }));
-  await wait();
-
-  run(() => find('.simple-view').trigger('mousemove'));
-  await wait();
-
-  previewDiv = findByLabel('preview-div');
-  assert.ok(!previewDiv.is(':visible'));
 });
 
 test("Highlighting a view without an element should not throw an error", async function t(assert) {

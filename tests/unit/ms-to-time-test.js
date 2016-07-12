@@ -1,4 +1,4 @@
-import { msToTime } from '../../../helpers/ms-to-time';
+import { msToTime } from 'ember-inspector/helpers/ms-to-time';
 import { module, test } from 'qunit';
 
 module('Unit | Helper | ms to time');

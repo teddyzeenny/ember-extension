@@ -26,6 +26,7 @@ module("Deprecation Debug", {
     });
     run(EmberDebug, 'start');
     port = EmberDebug.port;
+    EmberDebug.IGNORE_DEPRECATIONS = true;
     EmberDebug.deprecationDebug.reopen({
       fetchSourceMap: function() { return RSVP.resolve(null); },
       emberCliConfig: null
@@ -49,10 +50,12 @@ test("deprecations are caught and sent", async function t(assert) {
   });
 
   App.ApplicationRoute = Ember.Route.extend({
-    setupController: function() {
+    setupController() {
+      EmberDebug.IGNORE_DEPRECATIONS = false;
       Ember.deprecate('Deprecation 1');
       Ember.deprecate('Deprecation 2', false, { url: 'http://www.emberjs.com' });
       Ember.deprecate('Deprecation 1');
+      EmberDebug.IGNORE_DEPRECATIONS = true;
     }
   });
 
@@ -87,8 +90,10 @@ test('Warns once about deprecations', async function t(assert) {
   });
   App.ApplicationRoute = Ember.Route.extend({
     setupController() {
+      EmberDebug.IGNORE_DEPRECATIONS = false;
       Ember.deprecate('Deprecation 1');
       Ember.deprecate('Deprecation 2');
+      EmberDebug.IGNORE_DEPRECATIONS = true;
     }
   });
   await visit('/');

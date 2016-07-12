@@ -129,6 +129,9 @@ test("Searching the profiles", async function t(assert) {
   assert.equal(findByLabel('render-profile-name', rows[0]).text().trim(), "First View Rendering");
   assert.equal(findByLabel('render-profile-name', rows[1]).text().trim(), "Child view");
 
+  // Minimize to hide child view
+  await clickByLabel('render-main-cell');
+
   await fillIn('input', findByLabel('render-profiles-search'), '');
 
   rows = findByLabel('render-profile-row');

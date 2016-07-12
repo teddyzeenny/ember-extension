@@ -22,11 +22,11 @@ export default DatePicker.extend({
   },
 
   insertNewline() {
-    this.sendAction('save-property');
-    this.sendAction('finished-editing');
+    this.get('propertyComponent').send(this.get('save-property'));
+    this.get('propertyComponent').send(this.get('finished-editing'));
   },
 
   cancel() {
-    this.sendAction('finished-editing');
+    this.get('propertyComponent').send(this.get('finished-editing'));
   }
 });

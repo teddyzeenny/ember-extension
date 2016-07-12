@@ -376,7 +376,7 @@ test("Views are correctly handled when destroyed during transitions", async func
   await visit('/simple');
 
   objectId = find('.simple-view').get(0).id;
-  let view = Ember.View.views[objectId];
+  let view = App.__container__.lookup('-view-registry:main')[objectId];
   objectInspector.sendObject(view);
   await wait();
 

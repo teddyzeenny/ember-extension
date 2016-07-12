@@ -1,4 +1,5 @@
 import Ember from "ember";
+const { run: { schedule } } = Ember;
 // Currently used to determine the height of list-views
 export default Ember.View.extend({
   height: Ember.computed.alias('controller.contentHeight'),
@@ -9,7 +10,7 @@ export default Ember.View.extend({
     Ember.$(window).on('resize.view-' + this.get('elementId'), () => {
       Ember.run.debounce(this, 'updateHeight', 200);
     });
-    this.updateHeight();
+    schedule('afterRender', this, 'updateHeight');
   },
 
   updateHeight() {

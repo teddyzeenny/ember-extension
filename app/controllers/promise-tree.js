@@ -25,7 +25,7 @@ function itemProxyComputed(dependentKey, itemProxy) {
 
 export default Controller.extend({
   application: controller(),
-  
+
   queryParams: ['filter'],
 
   createdAfter: null,
@@ -55,11 +55,7 @@ export default Controller.extend({
   /* jscs:disable validateIndentation */
   // TODO: This filter can be further optimized
   filtered: filterComputed(
-    'model.@each.createdAt',
-    'model.@each.fulfilledBranch',
-    'model.@each.rejectedBranch',
-    'model.@each.pendingBranch',
-    'model.@each.isVisible', function(item) {
+    'model.@each.{createdAt,fulfilledBranch,rejectedBranch,pendingBranch,isVisible}', function(item) {
 
       // exclude cleared promises
       if (this.get('createdAfter') && item.get('createdAt') < this.get('createdAfter')) {

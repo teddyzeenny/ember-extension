@@ -3,7 +3,7 @@
     {{input value=search placeholder="Search"}}
   </div>
 
-  <button data-label="filter" {{bind-attr class="noFilterValue:active :toolbar__radio"}} {{action "setFilter"}}>
+  <button data-label="filter" class="{{if noFilterValue 'active'}} toolbar__radio" {{action "setFilter"}}>
     All
   </button>
 

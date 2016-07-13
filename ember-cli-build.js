@@ -29,6 +29,9 @@ var options = {
   },
   eslint: {
     testGenerator: eslintTestGenerator
+  },
+  'ember-cli-qunit': {
+    useLintTree: false
   }
 };
 

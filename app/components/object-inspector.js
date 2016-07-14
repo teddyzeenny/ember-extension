@@ -1,8 +1,17 @@
 import Ember from "ember";
-const { Controller, computed, inject: { controller } } = Ember;
+const { Component, computed } = Ember;
 const get = Ember.get;
-export default Controller.extend({
-  application: controller(),
+export default Component.extend({
+  tagName: '',
+
+  /**
+   * Application Controller passed
+   * through the template
+   *
+   * @property application
+   * @type {Controller}
+   */
+  application: null,
 
   trail: computed('model.[]', function() {
     let nested = this.get('model').slice(1);
@@ -26,6 +35,10 @@ export default Controller.extend({
       this.get('port').send('objectInspector:sendToConsole', {
         objectId
       });
+    },
+
+    toggleInspector() {
+      this.sendAction('toggleInspector', ...arguments);
     }
   }
 });

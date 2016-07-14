@@ -35,7 +35,7 @@
                 {{/if}}
                 <span class='mixin__property-name' data-label="object-property-name">{{property.model.name}}</span><span class='mixin__property-value-separator'>: </span>
                 {{#unless property.isEdit}}
-                  <span  {{action "valueClick" property.model target=property}} class="{{property.value.type}} mixin__property-value" data-label="object-property-value">{{property.model.value.inspect}}</span>
+                  <span  {{action "valueClick" property.model target=property}} class="{{property.model.value.type}} mixin__property-value" data-label="object-property-value">{{property.model.value.inspect}}</span>
                 {{else}}
                   {{#unless property.isDate}}
                     {{property-field value=property.txtValue finished-editing="finishedEditing" save-property="saveProperty" propertyComponent=property

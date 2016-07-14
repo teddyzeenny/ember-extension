@@ -9,7 +9,7 @@
               side="right"
               width=inspectorWidth
               classNames="split__panel"}}
-        {{render "mixinStack"}}
+        {{object-inspector application=this model=mixinStack mixinDetails=mixinDetails toggleInspector="toggleInspector"}}
       {{/draggable-column}}
     {{/if}}
   </div>

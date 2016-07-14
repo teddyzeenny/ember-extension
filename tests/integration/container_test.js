@@ -125,9 +125,17 @@ test("Successfully redirects if the container type is not found", async function
       }
     }
   });
-
+  let adapterException = Ember.Test.adapter.exception;
+  // Failed route causes a promise unhandled rejection
+  // even though there's an `error` action defined :(
+  Ember.Test.adapter.exception = err => {
+    if (!err || err.status !== 404) {
+      return adapterException.call(Ember.Test.adapter, err);
+    }
+  };
   await visit('/container-types/random-type');
   assert.equal(currentURL(), '/container-types');
+  Ember.Test.adapter.exception = adapterException;
 });
 
 test("Reload", async function t(assert) {

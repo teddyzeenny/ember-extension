@@ -4,8 +4,8 @@ const set = Ember.set;
 
 export default Route.extend({
 
-  setupController() {
-    this.controllerFor('mixinStack').set('model', []);
+  setupController(controller) {
+    controller.set('mixinStack', []);
     let port = this.get('port');
     port.on('objectInspector:updateObject', this, this.updateObject);
     port.on('objectInspector:updateProperty', this, this.updateProperty);
@@ -50,21 +50,20 @@ export default Route.extend({
   },
 
   updateProperty(options) {
-    const detail = this.controllerFor('mixinDetails').get('model.mixins').objectAt(options.mixinIndex);
+    const detail = this.get('controller.mixinDetails.mixins').objectAt(options.mixinIndex)
     const property = Ember.get(detail, 'properties').findBy('name', options.property);
     set(property, 'value', options.value);
   },
 
   updateErrors(options) {
-    const mixinDetails = this.controllerFor('mixinDetails');
-    if (mixinDetails.get('model.objectId') === options.objectId) {
-      mixinDetails.set('model.errors', options.errors);
+    let mixinDetails = this.get('controller.mixinDetails');
+    if (mixinDetails.get('objectId') === options.objectId) {
+      mixinDetails.set('errors', options.errors);
     }
   },
 
   droppedObject(message) {
-    let controller = this.get('controller');
-    controller.droppedObject(message.objectId);
+    this.get('controller').droppedObject(message.objectId);
   },
 
   actions: {

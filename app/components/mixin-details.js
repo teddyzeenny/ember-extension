@@ -1,6 +1,6 @@
 import Ember from "ember";
-const { Controller } = Ember;
-export default Controller.extend({
+const { Component } = Ember;
+export default Component.extend({
   actions: {
     traceErrors() {
       this.get('port').send('objectInspector:traceErrors', {

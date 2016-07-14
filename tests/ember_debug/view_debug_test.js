@@ -31,10 +31,10 @@ function setupApp() {
 
   App.Router.map(function() {
     this.route('simple');
-    this.resource('comments', function() {
+    this.route('comments', { resetNamespace: true }, function() {
 
     });
-    this.resource('posts');
+    this.route('posts', { resetNamespace: true });
   });
 
   App.ApplicationView = View.extend();

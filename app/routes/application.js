@@ -1,6 +1,7 @@
 import Ember from "ember";
 const { Route } = Ember;
 const set = Ember.set;
+const get = Ember.get;
 
 export default Route.extend({
 
@@ -50,15 +51,17 @@ export default Route.extend({
   },
 
   updateProperty(options) {
-    const detail = this.get('controller.mixinDetails.mixins').objectAt(options.mixinIndex)
+    const detail = this.get('controller.mixinDetails.mixins').objectAt(options.mixinIndex);
     const property = Ember.get(detail, 'properties').findBy('name', options.property);
     set(property, 'value', options.value);
   },
 
   updateErrors(options) {
     let mixinDetails = this.get('controller.mixinDetails');
-    if (mixinDetails.get('objectId') === options.objectId) {
-      mixinDetails.set('errors', options.errors);
+    if (mixinDetails) {
+      if (get(mixinDetails, 'objectId') === options.objectId) {
+        set(mixinDetails, 'errors', options.errors);
+      }
     }
   },
 

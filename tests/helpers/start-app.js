@@ -15,7 +15,7 @@ export default function startApp(attrs) {
   Application.instanceInitializer({
     name: generateGuid() + "-detectEmberApplication",
     initialize(instance) {
-      getOwner(instance).lookup('route:app-detected').reopen({
+      instance.lookup('route:app-detected').reopen({
         model: K
       });
     }

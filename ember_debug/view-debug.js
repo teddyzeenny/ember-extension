@@ -2,7 +2,7 @@
 import PortMixin from "ember-debug/mixins/port-mixin";
 
 const Ember = window.Ember;
-const { guidFor, $, computed, run, Object: EmberObject, View, typeOf, Component, ViewUtils, A } = Ember;
+const { guidFor, $, computed, run, Object: EmberObject, View, typeOf, Component, Controller, ViewUtils, A } = Ember;
 const { later } = run;
 const { oneWay } = computed;
 
@@ -733,6 +733,10 @@ export default EmberObject.extend(PortMixin, {
    * @return {Ember.Controller}
    */
   _controllerForNode(renderNode) {
+    // If it's a component then return the component instance itself
+    if (this._nodeIsEmberComponent(renderNode)) {
+      return this._viewInstanceForNode(renderNode);
+    };
     if (renderNode.lastResult) {
       let scope = renderNode.lastResult.scope;
       let controller;
@@ -741,9 +745,12 @@ export default EmberObject.extend(PortMixin, {
       } else {
         controller = scope.locals.controller.value();
       }
-      if (!controller && scope.getSelf) {
+      if ((!controller || !(controller instanceof Controller)) && scope.getSelf) {
         // Ember >= 2.2 + no ember-legacy-controllers addon
         controller = scope.getSelf().value();
+        if (!(controller instanceof Controller)) {
+          controller = controller._controller;
+        }
       }
       return controller;
     }
@@ -982,13 +989,12 @@ function shortModelName(model) {
 }
 
 function controllerName(controller) {
-  let
-   className = controller.constructor.toString(), match;
+  let match;
+  let className = controller.constructor.toString();
 
   if (match = className.match(/^\(subclass of (.*)\)/)) {
     className = match[1];
   }
-
   return className;
 }
 

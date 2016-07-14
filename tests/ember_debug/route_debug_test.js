@@ -17,8 +17,8 @@ function setupApp() {
 
   App.Router.map(function() {
     this.route('simple');
-    this.resource('posts');
-    this.resource('comments', function() {
+    this.route('posts', { resetNamespace: true });
+    this.route('comments', { resetNamespace: true }, function() {
       this.route('new');
       this.route('edit', { path: '/edit/:comment_id' });
     });

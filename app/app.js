@@ -2,10 +2,6 @@ import Ember from 'ember';
 import Resolver from 'ember/resolver';
 import loadInitializers from 'ember/load-initializers';
 import config from './config/environment';
-
-Error.stackTraceLimit = Infinity;
-
-
 import Port from "./port";
 import PromiseAssembler from "ember-inspector/libs/promise-assembler";
 

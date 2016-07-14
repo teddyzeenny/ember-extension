@@ -1,5 +1,5 @@
 import Ember from "ember";
-const { Controller, computed, observer, run, inject: { controller } } = Ember;
+const { Controller, computed, observer, run, inject: { controller }, getOwner } = Ember;
 const { equal, bool, and, not, filter } = computed;
 const { next, once } = run;
 
@@ -33,7 +33,7 @@ export default Controller.extend({
   },
 
   promiseItemController: computed(function() {
-    return this.container.lookupFactory('controller:promise-item');
+    return getOwner(this)._lookupFactory('controller:promise-item');
   }),
 
   /* jscs:disable validateIndentation */

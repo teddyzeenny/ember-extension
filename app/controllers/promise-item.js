@@ -1,5 +1,5 @@
 import Ember from "ember";
-const { computed, String: { htmlSafe } } = Ember;
+const { computed, String: { htmlSafe }, getOwner } = Ember;
 const { alias, notEmpty, empty, gt, equal } = computed;
 
 const COLOR_MAP = {
@@ -10,7 +10,7 @@ const COLOR_MAP = {
 
 export default Ember.ObjectProxy.extend({
   promiseTreeController: computed(function() {
-    return this.container.lookup('controller:promiseTree');
+    return getOwner(this).lookup('controller:promiseTree');
   }),
 
   filter: alias('promiseTreeController.filter'),

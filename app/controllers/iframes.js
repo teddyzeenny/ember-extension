@@ -1,5 +1,5 @@
 import Ember from "ember";
-const { Controller, computed, run, observer } = Ember;
+const { Controller, computed, run, observer, getOwner } = Ember;
 const { alias } = computed;
 
 export default Controller.extend({
@@ -20,7 +20,7 @@ export default Controller.extend({
     const url = '/';
     const applicationId = this.get('selectedApp');
     const list = this.get('port').get('detectedApplications');
-    let app = this.container.lookup('application:main');
+    let app = getOwner(this).lookup('application:main');
 
     run(app, app.reset);
     let router = app.__container__.lookup('router:main');

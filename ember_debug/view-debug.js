@@ -736,7 +736,7 @@ export default EmberObject.extend(PortMixin, {
     // If it's a component then return the component instance itself
     if (this._nodeIsEmberComponent(renderNode)) {
       return this._viewInstanceForNode(renderNode);
-    };
+    }
     if (renderNode.lastResult) {
       let scope = renderNode.lastResult.scope;
       let controller;

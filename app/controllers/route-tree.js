@@ -20,7 +20,7 @@ export default Controller.extend({
       let hideRoutes = this.get('options.hideRoutes');
 
       if (hideRoutes && currentRoute) {
-        return checkCurrentRoute( currentRoute, routeItem.value.name );
+        return checkCurrentRoute(currentRoute, routeItem.value.name);
       } else {
         return true;
       }

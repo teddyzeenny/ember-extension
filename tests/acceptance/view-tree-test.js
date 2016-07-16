@@ -106,171 +106,110 @@ function defaultViewTree() {
   });
 }
 
-test("It should correctly display the view tree", function(assert) {
+test("It should correctly display the view tree", async function(assert) {
   let viewTree = defaultViewTree();
 
-  visit('/');
+  await visit('/');
+  run(() => {
+    port.trigger('view:viewTree', { tree: viewTree } );
+  });
+  await wait();
 
-  andThen(() => {
-    run(() => {
-      port.trigger('view:viewTree', { tree: viewTree } );
-    });
-    return wait();
+  let $treeNodes = find('.js-view-item');
+  assert.equal($treeNodes.length, 3, 'expected some tree nodes');
+  let controllerNames = [];
+  let templateNames = [];
+  let modelNames = [];
+  let viewClassNames = [];
+  let durations = [];
+
+  function textFor(selector, context) {
+    return find(selector, context).filter(':first').text().trim();
+  }
+
+  $treeNodes.each(function() {
+    templateNames.push(textFor('.js-view-template', this));
+    controllerNames.push(textFor('.js-view-controller', this));
+    viewClassNames.push(textFor('.js-view-class', this));
+    modelNames.push(textFor('.js-view-model', this));
+    durations.push(textFor('.js-view-duration', this));
   });
 
-  andThen(() => {
+  assert.deepEqual(controllerNames, [
+    'App.ApplicationController',
+    'App.PostsController',
+    'App.CommentsController'
+  ], 'expected controller names');
 
-    let $treeNodes = find('.js-view-item');
-    assert.equal($treeNodes.length, 3, 'expected some tree nodes');
-    let controllerNames = [];
-    let templateNames = [];
-    let modelNames = [];
-    let viewClassNames = [];
-    let durations = [];
+  assert.deepEqual(templateNames, [
+    'application',
+    'posts',
+    'comments'
+  ], 'expected template names');
 
-    function textFor(selector, context) {
-      return find(selector, context).filter(':first').text().trim();
-    }
+  assert.deepEqual(modelNames, [
+    '--',
+    'PostsArray',
+    'CommentsArray'
+  ], 'expected model names');
 
-    $treeNodes.each(function() {
-      templateNames.push(textFor('.js-view-template', this));
-      controllerNames.push(textFor('.js-view-controller', this));
-      viewClassNames.push(textFor('.js-view-class', this));
-      modelNames.push(textFor('.js-view-model', this));
-      durations.push(textFor('.js-view-duration', this));
-    });
+  assert.deepEqual(viewClassNames, [
+    'App.ApplicationView',
+    'App.PostsView',
+    'App.CommentsView'
+  ], 'expected view class names');
 
-    assert.deepEqual(controllerNames, [
-      'App.ApplicationController',
-      'App.PostsController',
-      'App.CommentsController'
-    ], 'expected controller names');
+  assert.deepEqual(durations, [
+    '10.00ms',
+    '1.00ms',
+    '2.50ms'
+  ], 'expected render durations');
 
-    assert.deepEqual(templateNames, [
-      'application',
-      'posts',
-      'comments'
-    ], 'expected template names');
+  let titleTips = find('span[title]').toArray().map(node => {
+    return node.getAttribute('title');
+  }).sort();
 
-    assert.deepEqual(modelNames, [
-      '--',
-      'PostsArray',
-      'CommentsArray'
-    ], 'expected model names');
-
-    assert.deepEqual(viewClassNames, [
-      'App.ApplicationView',
-      'App.PostsView',
-      'App.CommentsView'
-    ], 'expected view class names');
-
-    assert.deepEqual(durations, [
-      '10.00ms',
-      '1.00ms',
-      '2.50ms'
-    ], 'expected render durations');
-
-    let titleTips = find('span[title]').toArray().map(node => {
-      return node.getAttribute('title');
-    }).sort();
-
-    assert.deepEqual(titleTips, [
-      'App.ApplicationController',
-      'App.ApplicationView',
-      'App.CommentsController',
-      'App.CommentsView',
-      'App.PostsController',
-      'App.PostsView',
-      'CommentsArray',
-      'PostsArray',
-      'application',
-      'application',
-      'comments',
-      'comments',
-      'posts',
-      'posts'
-    ], 'expected title tips');
-  });
-
+  assert.deepEqual(titleTips, [
+    'App.ApplicationController',
+    'App.ApplicationView',
+    'App.CommentsController',
+    'App.CommentsView',
+    'App.PostsController',
+    'App.PostsView',
+    'CommentsArray',
+    'PostsArray',
+    'application',
+    'application',
+    'comments',
+    'comments',
+    'posts',
+    'posts'
+  ], 'expected title tips');
 });
 
-test("It should update the view tree when the port triggers a change", function(assert) {
+test("It should update the view tree when the port triggers a change", async function(assert) {
   assert.expect(4);
   let $treeNodes, viewTree = defaultViewTree();
 
-  visit('/')
-  .then(function() {
-    port.trigger('view:viewTree', { tree: viewTree });
-    return wait();
-  })
-  .then(function() {
-    $treeNodes = find('.js-view-item');
-    assert.equal($treeNodes.length, 3);
-    assert.equal(find('.js-view-controller').filter(':last').text().trim(), 'App.CommentsController');
+  await visit('/');
+  run(() => port.trigger('view:viewTree', { tree: viewTree }));
+  await wait();
 
-    viewTree = defaultViewTree();
-    viewTree.children.splice(0, 1);
-    viewTree.children[0].value.controller.name = 'App.SomeController';
-    port.trigger('view:viewTree', { tree: viewTree });
-    return wait();
-  })
-  .then(function() {
-    $treeNodes = find('.js-view-item');
-    assert.equal($treeNodes.length, 2);
-    assert.equal(find('.js-view-controller').filter(':last').text().trim(), 'App.SomeController');
-  });
+  $treeNodes = find('.js-view-item');
+  assert.equal($treeNodes.length, 3);
+  assert.equal(find('.js-view-controller').filter(':last').text().trim(), 'App.CommentsController');
+
+  viewTree = defaultViewTree();
+  viewTree.children.splice(0, 1);
+  viewTree.children[0].value.controller.name = 'App.SomeController';
+  run(() => port.trigger('view:viewTree', { tree: viewTree }));
+  await wait();
+  $treeNodes = find('.js-view-item');
+  assert.equal($treeNodes.length, 2);
+  assert.equal(find('.js-view-controller').filter(':last').text().trim(), 'App.SomeController');
 });
 
-test("Previewing / showing a view on the client", function(assert) {
-  let messageSent = null;
-  port.reopen({
-    send: function(name, message) {
-      messageSent = { name: name, message: message };
-    }
-  });
-
-  visit('/')
-  .then(function() {
-    let viewTree = defaultViewTree();
-    viewTree.children = [];
-    port.trigger('view:viewTree', { tree: viewTree });
-    return wait();
-  })
-  .triggerEvent('.js-view-item', 'mouseenter')
-  .then(function() {
-    assert.equal(messageSent.name, 'view:previewLayer', "Client asked to preview layer");
-    assert.equal(messageSent.message.objectId, 'applicationView', "Client sent correct id to preview layer");
-  })
-  .triggerEvent('.js-view-item', 'mouseleave')
-  .then(function() {
-    assert.equal(messageSent.name, 'view:hidePreview', "Client asked to hide preview");
-  });
-});
-
-test("Inspecting views on hover", function(assert) {
-  let messageSent = null;
-  port.reopen({
-    send: function(name, message) {
-      messageSent = { name: name, message: message };
-    }
-  });
-
-  visit('/');
-  click('.js-inspect-views');
-  andThen(() => {
-    assert.equal(messageSent.name, 'view:inspectViews');
-    assert.deepEqual(messageSent.message, { inspect: true });
-    port.trigger('view:startInspecting');
-    return wait();
-  })
-  .click('.js-inspect-views')
-  .then(function() {
-    assert.equal(messageSent.name, 'view:inspectViews');
-    assert.deepEqual(messageSent.message, { inspect: false });
-  });
-});
-
-test("Configuring which views to show", function(assert) {
+test("Previewing / showing a view on the client", async function(assert) {
   let messageSent = null;
   port.reopen({
     send(name, message) {
@@ -278,57 +217,78 @@ test("Configuring which views to show", function(assert) {
     }
   });
 
-  visit('/');
-
-  andThen(() => {
-    let checkbox = find('.js-filter-components input');
-    checkbox.prop('checked', true);
-    checkbox.trigger('change');
-    return wait();
-  })
-  .then(function() {
-    assert.equal(messageSent.name, 'view:setOptions');
-    assert.deepEqual(messageSent.message.options, { components: true, allViews: false });
-    return wait();
-  })
-  .then(function() {
-    let checkbox = find('.js-filter-all-views input');
-    checkbox.prop('checked', true);
-    checkbox.trigger('change');
-    return wait();
-  })
-  .then(function() {
-    assert.equal(messageSent.name, 'view:setOptions');
-    assert.deepEqual(messageSent.message.options, { components: true, allViews: true });
-    return wait();
-  });
+  await visit('/');
+  let viewTree = defaultViewTree();
+  viewTree.children = [];
+  run(() => port.trigger('view:viewTree', { tree: viewTree }));
+  await wait();
+  await triggerEvent('.js-view-item', 'mouseenter');
+  assert.equal(messageSent.name, 'view:previewLayer', "Client asked to preview layer");
+  assert.equal(messageSent.message.objectId, 'applicationView', "Client sent correct id to preview layer");
+  await triggerEvent('.js-view-item', 'mouseleave');
+  assert.equal(messageSent.name, 'view:hidePreview', "Client asked to hide preview");
 });
 
-test("Inspecting a model", function(assert) {
+test("Inspecting views on hover", async function(assert) {
   let messageSent = null;
   port.reopen({
-    send: function(name, message) {
+    send(name, message) {
       messageSent = { name: name, message: message };
     }
   });
 
-  visit('/');
-  andThen(() => {
-    let tree = defaultViewTree();
-    run(() => {
-      port.trigger('view:viewTree', { tree } );
-    });
-    return wait();
+  await visit('/');
+  await click('.js-inspect-views');
+  assert.equal(messageSent.name, 'view:inspectViews');
+  assert.deepEqual(messageSent.message, { inspect: true });
+  run(() => port.trigger('view:startInspecting'));
+  await wait();
+  await click('.js-inspect-views');
+  assert.equal(messageSent.name, 'view:inspectViews');
+  assert.deepEqual(messageSent.message, { inspect: false });
+});
+
+test("Configuring which views to show", async function(assert) {
+  let messageSent = null;
+  port.reopen({
+    send(name, message) {
+      messageSent = { name: name, message: message };
+    }
   });
 
-  andThen(() => {
-    let model = find('.js-view-model-clickable').eq(0);
-    return click(model);
+  await visit('/');
+  let checkbox = find('.js-filter-components input');
+  checkbox.prop('checked', true);
+  checkbox.trigger('change');
+  await wait();
+  assert.equal(messageSent.name, 'view:setOptions');
+  assert.deepEqual(messageSent.message.options, { components: true, allViews: false });
+  await wait();
+  checkbox = find('.js-filter-all-views input');
+  checkbox.prop('checked', true);
+  checkbox.trigger('change');
+  await wait();
+  assert.equal(messageSent.name, 'view:setOptions');
+  assert.deepEqual(messageSent.message.options, { components: true, allViews: true });
+  await wait();
+});
+
+test("Inspecting a model", async function(assert) {
+  let messageSent = null;
+  port.reopen({
+    send(name, message) {
+      messageSent = { name: name, message: message };
+    }
   });
 
-  andThen(() => {
-    assert.equal(messageSent.name, 'objectInspector:inspectById');
-    assert.equal(messageSent.message.objectId, 'postsArray');
+  await visit('/');
+  let tree = defaultViewTree();
+  run(() => {
+    port.trigger('view:viewTree', { tree } );
   });
-
+  await wait();
+  let model = find('.js-view-model-clickable').eq(0);
+  await click(model);
+  assert.equal(messageSent.name, 'objectInspector:inspectById');
+  assert.equal(messageSent.message.objectId, 'postsArray');
 });

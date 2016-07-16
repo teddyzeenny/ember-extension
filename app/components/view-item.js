@@ -5,18 +5,9 @@ const { not, bool } = computed;
 export default Component.extend({
   classNames: ['list__row'],
 
-  classNameBindings: ['isCurrent:row_highlight'],
-
   hasView: not('model.value.isVirtual'),
   hasElement: not('model.value.isVirtual'),
   hasModel: bool('model.value.model'),
-
-  // passed as an attribute
-  pinnedObjectId: null,
-
-  isCurrent: computed('pinnedObjectId', 'model.value.objectId', function() {
-    return this.get('pinnedObjectId') === this.get('model.value.objectId');
-  }),
 
   hasController: bool('model.value.controller'),
 

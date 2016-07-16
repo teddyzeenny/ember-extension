@@ -6,8 +6,8 @@ export default Component.extend({
   // passed as an attribute to the component
   currentRoute: null,
 
-  classNames: ['list-tree__item', 'row'],
-  classNameBindings: ['isCurrent:row_highlight'],
+  classNames: ['list__row'],
+  classNameBindings: ['isCurrent:list__row_highlight'],
   attributeBindings: ['label:data-label'],
 
   label: 'route-node',
@@ -23,5 +23,20 @@ export default Component.extend({
     }
 
     return checkCurrentRoute( currentRoute, this.get('model.value.name') );
-  })
+  }),
+
+  actions: {
+    inspectRoute(...args) {
+      this.sendAction('inspectRoute', ...args);
+    },
+    sendRouteHandlerToConsole(...args) {
+      this.sendAction('sendRouteHandlerToConsole', ...args);
+    },
+    inspectController(...args) {
+      this.sendAction('inspectController', ...args);
+    },
+    sendControllerToConsole(...args) {
+      this.sendAction('sendControllerToConsole', ...args);
+    }
+  }
 });

@@ -17,6 +17,10 @@
   /********************/
 }
 
+.list__content {
+  overflow-y: scroll;
+}
+
 .list__row {
   display: flex;
 }
@@ -133,6 +137,12 @@
 
   .list__cell-partial_clickable {
     text-decoration: underline;
+  }
+}
+
+.list__row_highlight {
+  .list__cell {
+    opacity: 1;
   }
 }
 

@@ -9,11 +9,7 @@ const COLOR_MAP = {
 export default Component.extend({
   modelTypeColumns: null,
 
-  classNames: ['list-tree__item', 'row', 'row_highlight'],
-
-  attributeBindings: ['label:data-label'],
-
-  label: 'record-row',
+  classNames: ['list__row', 'list__row_highlight'],
 
   // TODO: Color record based on `color` property.
   style: computed('model.color', function() {

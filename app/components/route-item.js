@@ -8,9 +8,6 @@ export default Component.extend({
 
   classNames: ['list__row'],
   classNameBindings: ['isCurrent:list__row_highlight'],
-  attributeBindings: ['label:data-label'],
-
-  label: 'route-node',
 
   labelStyle: computed('model.parentCount', function() {
     return htmlSafe(`padding-left: ${+this.get('model.parentCount') * 20 + 5}px;`);

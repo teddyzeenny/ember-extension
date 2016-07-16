@@ -1,1 +1,1 @@
-export { default } from 'ember-inspector/components/list';
+export { default } from 'ember-inspector/components/list-content';

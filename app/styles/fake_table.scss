@@ -62,14 +62,13 @@
 
 .row-wrapper {
   width: 100%;
-  background: #f3f3f3;
+  // background: #f3f3f3;
   height: 30px;
 }
 
 .row-wrapper:nth-of-type(2n) {
-  background: #fff;
+  // background: #fff;
 }
-
 
 .row.row_highlight .cell {
   opacity: 1;

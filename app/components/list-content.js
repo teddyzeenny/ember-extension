@@ -15,22 +15,18 @@ export default Component.extend({
    * @property classNames
    * @type {Array}
    */
-  classNames: ["list-tree", "ember-list-view"],
+  classNames: ["list__content"],
 
   /**
-   * Temporary way to pass the controller
-   * is through the template.
+   * Pass this thought the template.
+   * It's the application controller's  `contentHeight`
+   * property.
    *
-   * @property owner
-   * @type {Controller}
-   */
-  owner: null,
-
-  /**
    * @property contentHeight
    * @type {Integer}
+   * @default null
    */
-  contentHeight: readOnly('owner.application.contentHeight'),
+  contentHeight: null,
 
   attributeBindings: ['style'],
 

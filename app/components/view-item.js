@@ -3,7 +3,7 @@ const { computed, Component, String: { htmlSafe } } = Ember;
 const { not, bool } = computed;
 
 export default Component.extend({
-  classNames: ['list-tree__item', 'row'],
+  classNames: ['list__row'],
 
   classNameBindings: ['isCurrent:row_highlight'],
 
@@ -28,6 +28,24 @@ export default Component.extend({
     return htmlSafe(`padding-left: ${+this.get('model.parentCount') * 20 + 5}px;`);
   }),
 
+  /**
+   * @method mouseEnter
+   * @param {Object} e event object
+   */
+  mouseEnter(e) {
+    this.sendAction('previewLayer', this.get('model'));
+    e.stopPropagation();
+  },
+
+  /**
+   * @method mouseLeave
+   * @param {Object} e event object
+   */
+  mouseLeave(e) {
+    this.sendAction('hidePreview', this.get('model'));
+    e.stopPropagation();
+  },
+
   actions: {
     inspectView() {
       if (this.get('hasView')) {
@@ -47,6 +65,15 @@ export default Component.extend({
       if (this.get('modelInspectable')) {
         this.sendAction('inspect', objectId);
       }
+    },
+    sendModelToConsole(...args) {
+      this.sendAction('sendModelToConsole', ...args);
+    },
+    inspect(...args) {
+      this.sendAction('inspect', ...args);
+    },
+    sendObjectToConsole(...args) {
+      this.sendAction('sendObjectToConsole', ...args);
     }
   }
 

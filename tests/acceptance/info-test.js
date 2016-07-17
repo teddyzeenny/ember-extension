@@ -32,19 +32,19 @@ module('Info Tab', {
 });
 
 test("Libraries are displayed correctly", async function t(assert) {
-  const infoRoute = App.__container__.lookup('route:info');
+  let infoRoute = App.__container__.lookup('route:info');
   infoRoute.reopen({
     version: '9.9.9'
   });
 
   await visit('/info');
 
-  let libraries = findByLabel('library-row');
+  let libraries = find('.js-library-row');
   assert.equal(libraries.length, 3, "The correct number of libraries is displayed");
-  assert.equal(findByLabel('lib-name', libraries[0]).text().trim(), 'Ember Inspector', 'Ember Inspector is added automatically');
-  assert.equal(findByLabel('lib-version', libraries[0]).text().trim(), '9.9.9');
-  assert.equal(findByLabel('lib-name', libraries[1]).text().trim(), 'Ember');
-  assert.equal(findByLabel('lib-version', libraries[1]).text().trim(), '1.0');
-  assert.equal(findByLabel('lib-name', libraries[2]).text().trim(), 'Handlebars');
-  assert.equal(findByLabel('lib-version', libraries[2]).text().trim(), '2.1');
+  assert.equal(find('.js-lib-name', libraries[0]).text().trim(), 'Ember Inspector', 'Ember Inspector is added automatically');
+  assert.equal(find('.js-lib-version', libraries[0]).text().trim(), '9.9.9');
+  assert.equal(find('.js-lib-name', libraries[1]).text().trim(), 'Ember');
+  assert.equal(find('.js-lib-version', libraries[1]).text().trim(), '1.0');
+  assert.equal(find('.js-lib-name', libraries[2]).text().trim(), 'Handlebars');
+  assert.equal(find('.js-lib-version', libraries[2]).text().trim(), '2.1');
 });

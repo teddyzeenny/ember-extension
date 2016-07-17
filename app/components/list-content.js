@@ -34,12 +34,14 @@ export default Component.extend({
     return htmlSafe(`height:${this.get('height')}px`);
   }),
 
+  headerHeight: 31,
+
   /**
    * @property height
    * @type {Integer}
    */
   height: computed('contentHeight', function() {
-    let headerHeight = 31;
+    let headerHeight = this.get('headerHeight');
     let contentHeight = this.get('contentHeight');
 
     // In testing list-view is created before `contentHeight` is set

@@ -5,20 +5,22 @@ const { notEmpty } = computed;
 export default Component.extend({
   isExpanded: true,
 
-  hasMap: notEmpty('model.hasSourceMap'),
+  tagName: '',
 
-  expandedClass: computed('hasMap', 'isExpanded', function() {
-    if (this.get('isExpanded')) {
-      return 'row_arrow_expanded';
-    } else {
-      return 'row_arrow_collapsed';
-    }
-  }),
+  hasMap: notEmpty('model.hasSourceMap'),
 
   actions: {
     toggleExpand() {
       this.toggleProperty('isExpanded');
+    },
+    openResource(...args) {
+      this.sendAction('openResource', ...args);
+    },
+    traceSource(...args) {
+      this.sendAction('traceSource', ...args);
+    },
+    traceDeprecations(...args) {
+      this.sendAction('traceDeprecations', ...args);
     }
-
   }
 });

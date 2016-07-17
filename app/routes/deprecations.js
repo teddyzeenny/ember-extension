@@ -19,7 +19,7 @@ export default TabRoute.extend({
   },
 
   deprecationsAdded(message) {
-    const model = this.get('currentModel');
+    let model = this.get('currentModel');
     message.deprecations.forEach(item => {
       let record = model.findBy('id', item.id);
       if (record) {

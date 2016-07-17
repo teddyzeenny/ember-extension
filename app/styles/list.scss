@@ -31,7 +31,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   line-height: 30px;
-  height: 30px;
+  min-height: 30px;
   padding-left: 5px;
   box-sizing: border-box;
 
@@ -173,13 +173,13 @@
 }
 
 .list__row_arrow_collapsed {
-  .list_cell-arrow:before {
+  .list__cell-arrow:before {
     content: "\25B6";
   }
 }
 .list__row_arrow_expanded {
-  .list_cell-arrow:before {
-    content: "\25B6";
+  .list__cell-arrow:before {
+    content: "\25BC";
   }
 }
 /*************************/

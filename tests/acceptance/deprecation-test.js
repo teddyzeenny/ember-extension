@@ -49,7 +49,7 @@ module('Deprecation Tab', {
   }
 });
 
-test('No source map', async function t(assert) {
+test('No source map', async function(assert) {
   port.reopen({
     send(name) {
       if (name === 'deprecation:watch') {
@@ -74,21 +74,18 @@ test('No source map', async function t(assert) {
 
   await visit('/deprecations');
 
-  let rows = findByLabel('deprecation-item');
-  assert.equal(rows.length, 1);
-  let row = rows[0];
-  assert.equal(findByLabel('deprecation-source', row).length, 0, 'no sources');
-  assert.equal(findByLabel('deprecation-message', row).text().trim(), 'Deprecation 1', 'message shown');
-  assert.equal(findByLabel('deprecation-count', row).text().trim(), 2, 'Count correct');
-  assert.equal(findByLabel('deprecation-full-trace', row).length, 1, 'Full trace button shown');
-  await clickByLabel('full-trace-deprecations-btn', row);
+  assert.equal(find('.js-deprecation-source:first').length, 0, 'no sources');
+  assert.equal(find('.js-deprecation-message:first').text().trim(), 'Deprecation 1', 'message shown');
+  assert.equal(find('.js-deprecation-count:first').text().trim(), 2, 'Count correct');
+  assert.equal(find('.js-deprecation-full-trace:first').length, 1, 'Full trace button shown');
+  await click('.js-full-trace-deprecations-btn:first');
 
   assert.equal(name, 'deprecation:sendStackTraces');
   assert.equal(message.deprecation.message, 'Deprecation 1');
   assert.equal(message.deprecation.sources.length, 2);
 });
 
-test("With source map, source found, can't open resource", async function t(assert) {
+test("With source map, source found, can't open resource", async function(assert) {
   port.reopen({
     send(name) {
       if (name === 'deprecation:watch') {
@@ -102,27 +99,24 @@ test("With source map, source found, can't open resource", async function t(asse
 
   await visit('/deprecations');
 
-  let rows = findByLabel('deprecation-item');
-  assert.equal(rows.length, 1);
-  let row = rows[0];
-  assert.equal(findByLabel('deprecation-message', row).text().trim(), 'Deprecation 1', 'message shown');
-  assert.equal(findByLabel('deprecation-count', row).text().trim(), 2, 'Count correct');
-  assert.equal(findByLabel('deprecation-full-trace', row).length, 0, 'Full trace button not shown');
+  assert.equal(find('.js-deprecation-message:first').text().trim(), 'Deprecation 1', 'message shown');
+  assert.equal(find('.js-deprecation-count:first').text().trim(), 2, 'Count correct');
+  assert.equal(find('.js-deprecation-full-trace:first').length, 0, 'Full trace button not shown');
 
-  let sources = findByLabel('deprecation-source', row);
+  let sources = find('.js-deprecation-source');
   assert.equal(sources.length, 2, 'shows all sources');
-  assert.equal(findByLabel('deprecation-source-link', sources[0]).length, 0, 'source not clickable');
-  assert.equal(findByLabel('deprecation-source-text', sources[0]).text().trim(), 'path-to-file.js:1');
-  assert.equal(findByLabel('deprecation-source-link', sources[1]).length, 0, 'source not clickable');
-  assert.equal(findByLabel('deprecation-source-text', sources[1]).text().trim(), 'path-to-second-file.js:2');
+  assert.equal(find('.js-deprecation-source-link', sources[0]).length, 0, 'source not clickable');
+  assert.equal(find('.js-deprecation-source-text', sources[0]).text().trim(), 'path-to-file.js:1');
+  assert.equal(find('.js-deprecation-source-link', sources[1]).length, 0, 'source not clickable');
+  assert.equal(find('.js-deprecation-source-text', sources[1]).text().trim(), 'path-to-second-file.js:2');
 
-  await clickByLabel('trace-deprecations-btn', sources[0]);
+  await click('.js-trace-deprecations-btn', sources[0]);
 
   assert.equal(name, 'deprecation:sendStackTraces');
   assert.equal(message.deprecation.message, 'Deprecation 1');
   assert.equal(message.deprecation.sources.length, 1);
 
-  await clickByLabel('trace-deprecations-btn', sources[1]);
+  await click('.js-trace-deprecations-btn', sources[1]);
 
   assert.equal(name, 'deprecation:sendStackTraces');
   assert.equal(message.deprecation.message, 'Deprecation 1');
@@ -130,7 +124,7 @@ test("With source map, source found, can't open resource", async function t(asse
 
 });
 
-test("With source map, source found, can open resource", async function t(assert) {
+test("With source map, source found, can open resource", async function(assert) {
   let openResourceArgs = false;
   port.get('adapter').reopen({
     canOpenResource: true,
@@ -151,37 +145,34 @@ test("With source map, source found, can open resource", async function t(assert
 
   await visit('/deprecations');
 
-  let rows = findByLabel('deprecation-item');
-  assert.equal(rows.length, 1);
-  let row = rows[0];
-  assert.equal(findByLabel('deprecation-message', row).text().trim(), 'Deprecation 1', 'message shown');
-  assert.equal(findByLabel('deprecation-count', row).text().trim(), 2, 'Count correct');
-  assert.equal(findByLabel('deprecation-full-trace', row).length, 0, 'Full trace button not shown');
+  assert.equal(find('.js-deprecation-message:first').text().trim(), 'Deprecation 1', 'message shown');
+  assert.equal(find('.js-deprecation-count:first').text().trim(), 2, 'Count correct');
+  assert.equal(find('.js-deprecation-full-trace:first').length, 0, 'Full trace button not shown');
 
-  let sources = findByLabel('deprecation-source', row);
+  let sources = find('.js-deprecation-source');
   assert.equal(sources.length, 2, 'shows all sources');
-  assert.equal(findByLabel('deprecation-source-text', sources[0]).length, 0, 'source clickable');
-  assert.equal(findByLabel('deprecation-source-link', sources[0]).text().trim(), 'path-to-file.js:1');
-  assert.equal(findByLabel('deprecation-source-text', sources[1]).length, 0, 'source clickable');
-  assert.equal(findByLabel('deprecation-source-link', sources[1]).text().trim(), 'path-to-second-file.js:2');
+  assert.equal(find('.js-deprecation-source-text', sources[0]).length, 0, 'source clickable');
+  assert.equal(find('.js-deprecation-source-link', sources[0]).text().trim(), 'path-to-file.js:1');
+  assert.equal(find('.js-deprecation-source-text', sources[1]).length, 0, 'source clickable');
+  assert.equal(find('.js-deprecation-source-link', sources[1]).text().trim(), 'path-to-second-file.js:2');
 
   openResourceArgs = false;
-  await clickByLabel('deprecation-source-link', sources[0]);
+  await click('.js-deprecation-source-link', sources[0]);
 
   assert.ok(openResourceArgs);
   openResourceArgs = false;
 
-  await clickByLabel('deprecation-source-link', sources[1]);
+  await click('.js-deprecation-source-link', sources[1]);
 
   assert.ok(openResourceArgs);
   openResourceArgs = false;
 
-  await clickByLabel('trace-deprecations-btn', sources[0]);
+  await click('.js-trace-deprecations-btn', sources[0]);
 
   assert.equal(name, 'deprecation:sendStackTraces');
   assert.equal(message.deprecation.message, 'Deprecation 1');
   assert.equal(message.deprecation.sources.length, 1);
-  await clickByLabel('trace-deprecations-btn', sources[1]);
+  await click('.js-trace-deprecations-btn', sources[1]);
   assert.equal(name, 'deprecation:sendStackTraces');
   assert.equal(message.deprecation.message, 'Deprecation 1');
   assert.equal(message.deprecation.sources.length, 1);

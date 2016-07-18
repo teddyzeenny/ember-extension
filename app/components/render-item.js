@@ -5,9 +5,9 @@ const { gt, readOnly } = computed;
 const { once } = run;
 
 export default Component.extend({
-  owner: null,
+  tagName: '',
 
-  search: readOnly('owner.search'),
+  search: null,
 
   isExpanded: false,
 
@@ -58,9 +58,9 @@ export default Component.extend({
     if (!this.get('hasChildren')) { return; }
 
     if (this.get('isExpanded')) {
-      return 'row_arrow_expanded';
+      return 'list__cell_arrow_expanded';
     } else {
-      return 'row_arrow_collapsed';
+      return 'list__cell_arrow_collapsed';
     }
   }),
 

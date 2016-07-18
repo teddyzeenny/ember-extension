@@ -28,11 +28,3 @@ export default function startApp(attrs) {
 
   return application;
 }
-
-// The below were copied when migrating from grunt system.
-// Should fix later
-
-Ember.View.reopen({
-  attributeBindings: ['label:data-label'],
-  label: null
-});

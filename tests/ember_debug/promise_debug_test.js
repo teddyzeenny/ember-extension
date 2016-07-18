@@ -136,6 +136,8 @@ test("Instrumentation with stack is persisted to session storage", function(asse
       }
     }
   });
+  // Clear CP cache
+  EmberDebug.get('promiseDebug').propertyDidChange('instrumentWithStack');
 
   andThen(function() {
     port.trigger('promise:getInstrumentWithStack');

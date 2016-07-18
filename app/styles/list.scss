@@ -101,6 +101,10 @@
   cursor: pointer;
 }
 
+.list__cell-partial_size_medium {
+  max-width: calc(100% - 60px);
+}
+
 /**
  * For example a $E icon to the right
  * of a cell.
@@ -126,6 +130,10 @@
   }
 }
 
+.list__link {
+  cursor: pointer;
+}
+
 .list__row:hover {
   .list__cell {
     opacity: 1;
@@ -136,6 +144,10 @@
   }
 
   .list__cell-partial_clickable {
+    text-decoration: underline;
+  }
+
+  .list__link {
     text-decoration: underline;
   }
 }
@@ -166,6 +178,26 @@
   }
 }
 
+/* cell expanding/collapsing */
+.list__cell_arrow_expanded,
+.list__cell_arrow_collapsed {
+  cursor: pointer;
+}
+
+.list__cell_arrow_collapsed {
+  .list__cell-arrow:before {
+    content: "\25B6";
+  }
+}
+.list__cell_arrow_expanded {
+  .list__cell-arrow:before {
+    content: "\25BC";
+  }
+}
+
+
+
+/* row expaxding/collapsing */
 .list__row_arrow_collapsed,
 .list__row_arrow_expanded {
   cursor: pointer;

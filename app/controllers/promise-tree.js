@@ -20,22 +20,6 @@ export default Controller.extend({
   // It is opt-in due to performance reasons.
   instrumentWithStack: false,
 
-  init() {
-    this._super(...arguments);
-    // List-view does not support item controllers
-    this.reopen({
-      items: computed('filtered.[]', function() {
-        return this.get('filtered').map(content => {
-          return this.get('promiseItemController').create({ content });
-        });
-      })
-    });
-  },
-
-  promiseItemController: computed(function() {
-    return getOwner(this)._lookupFactory('controller:promise-item');
-  }),
-
   /* jscs:disable validateIndentation */
   filtered: filter(
     'model.@each.{createdAt,fulfilledBranch,rejectedBranch,pendingBranch,isVisible}', function(item) {

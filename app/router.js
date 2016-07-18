@@ -18,9 +18,7 @@ Router.map(function() {
       });
     });
 
-    this.route('promises', { resetNamespace: true }, function() {
-      this.route('promise-tree', { resetNamespace: true });
-    });
+    this.route('promise-tree', { resetNamespace: true });
 
     this.route('info', { resetNamespace: true });
     this.route('render-tree', { resetNamespace: true });

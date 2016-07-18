@@ -36,7 +36,7 @@ export default TabRoute.extend({
     },
 
     toggleExpand(promise) {
-      const isExpanded = !promise.get('isExpanded');
+      let isExpanded = !promise.get('isExpanded');
       promise.set('isManuallyExpanded', isExpanded);
       promise.recalculateExpanded();
       let children = promise._allChildren();

@@ -74,7 +74,6 @@ export default Component.extend({
         this.set('dateValue', new Date(value));
       }
       this.set('isEdit', true);
-
     },
 
     saveProperty() {
@@ -90,6 +89,12 @@ export default Component.extend({
 
     finishedEditing() {
       this.set('isEdit', false);
+    },
+
+    dateSelected(val) {
+      this.set('dateValue', val);
+      this.send('saveProperty');
+      this.send('finishedEditing');
     }
   }
 });

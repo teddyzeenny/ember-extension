@@ -6,11 +6,8 @@
 */
 
 .app {
-  display: -webkit-flex;
   display: flex;
-  -webkit-flex-direction: column;
   flex-direction: column;
-  -webkit-flex: auto;
   flex: auto;
   overflow: hidden;
   position: absolute;
@@ -31,10 +28,7 @@
 @import "dropdown";
 @import "error_page";
 @import "external_link";
-@import "fake_table";
 @import "list";
-@import "list_tree";
-@import "list_view";
 @import "mixin";
 @import "nav";
 @import "notice";
@@ -43,6 +37,4 @@
 @import "send_to_console";
 @import "sidebar_toggle";
 @import "split";
-@import "table_tree";
 @import "toolbar";
-@import "tree";

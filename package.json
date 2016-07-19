@@ -22,8 +22,7 @@
   },
   "repository": "https://github.com/emberjs/ember-inspector",
   "engines": {
-    "node": ">= 0.10.0",
-    "npm": ">= 2.0.0"
+    "node": ">= 0.10.0"
   },
   "emberVersionsSupported": [
     "2.7.0",
@@ -52,7 +51,7 @@
     "broccoli-wrap": "0.0.2",
     "ember-ajax": "0.7.1",
     "ember-async-image": "0.1.1",
-    "ember-cli": "2.5.0",
+    "ember-cli": "^2.6.3",
     "ember-cli-app-version": "^1.0.0",
     "ember-cli-babel": "^5.1.6",
     "ember-cli-dependency-checker": "^1.2.0",

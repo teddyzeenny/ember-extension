@@ -19,15 +19,15 @@ function setupApp() {
     this.route('simple');
   });
 
-  App.SimpleView = Ember.View;
+  App.XSimpleComponent = Ember.Component;
 
-  Ember.TEMPLATES.simple = compile('Simple {{input class="simple-input"}} {{view "simple" classNames="simple-view"}}');
+  Ember.TEMPLATES.simple = compile('Simple {{input class="simple-input"}} {{x-simple class="simple-view"}}');
 }
 
 let ignoreErrors = true;
 
 module("Ember Debug - Object Inspector", {
-  beforeEach: async function t() {
+  beforeEach: async function() {
     /* globals require */
     EmberDebug = require('ember-debug/main').default;
     EmberDebug.Port = EmberDebug.Port.extend({
@@ -370,7 +370,7 @@ test("Read Only Computed properties mush have a readOnly property", function(ass
   assert.ok(!properties[1].readOnly);
 });
 
-test("Views are correctly handled when destroyed during transitions", async function t(assert) {
+test("Views are correctly handled when destroyed during transitions", async function(assert) {
   let objectId = null;
 
   await visit('/simple');
@@ -387,7 +387,7 @@ test("Views are correctly handled when destroyed during transitions", async func
   assert.ok(true, "No exceptions thrown");
 });
 
-test("Objects are dropped on destruction", async function t(assert) {
+test("Objects are dropped on destruction", async function(assert) {
   let didDestroy = false;
   let object = Ember.Object.create({
     willDestroy: function() {
@@ -412,7 +412,7 @@ test("Objects are dropped on destruction", async function t(assert) {
 
 });
 
-test("Properties ending with `Binding` are skipped", async function t(assert) {
+test("Properties ending with `Binding` are skipped", async function(assert) {
   let object = Ember.Object.create({
     bar: 'test',
     fooBinding: 'bar'
@@ -429,7 +429,7 @@ test("Properties ending with `Binding` are skipped", async function t(assert) {
   assert.equal(props[1].name, 'foo');
 });
 
-test("Properties listed in _debugInfo but don't exist should be skipped silently", async function t(assert) {
+test("Properties listed in _debugInfo but don't exist should be skipped silently", async function(assert) {
   let object = Ember.Object.create({
     foo: 'test',
     _debugInfo() {
@@ -454,7 +454,7 @@ test("Properties listed in _debugInfo but don't exist should be skipped silently
   assert.equal(props[0].name, 'foo');
 });
 
-test("Errors while computing CPs are handled", async function t(assert) {
+test("Errors while computing CPs are handled", async function(assert) {
   // catch error port messages (ignored by default)
   ignoreErrors = false;
 

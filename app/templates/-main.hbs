@@ -3,7 +3,7 @@
           width=navWidth
           classNames="split__panel split__panel--sidebar-1"}}
     <div class="split__panel__hd">
-      {{render "iframes"}}
+      {{iframe-picker}}
     </div>
     <div class="split__panel__bd">
       {{partial "nav"}}
@@ -24,8 +24,8 @@
       {{/unless}}
     </div>
 
-    {{#view "main-content" classNames="split__panel__bd" controller=this}}
+    {{#main-content class="split__panel__bd" updateHeight=(action "updateContentHeight")}}
       {{outlet}}
-    {{/view}}
+    {{/main-content}}
   </div>
 </div>

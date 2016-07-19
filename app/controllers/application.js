@@ -1,7 +1,9 @@
 import Ember from "ember";
-const { computed, computed: { equal }, inject: { controller } } = Ember;
+const { Controller, computed, computed: { equal }, inject: { controller } } = Ember;
 
-export default Ember.Controller.extend({
+export default Controller.extend({
+  isDragging: false,
+  contentHeight: null,
   emberApplication: false,
   navWidth: 180,
   inspectorWidth: 360,
@@ -64,5 +66,10 @@ export default Ember.Controller.extend({
       this.set('mixinDetails', null);
     }
 
+  },
+  actions: {
+    updateContentHeight(height) {
+      this.set('contentHeight', height);
+    }
   }
 });

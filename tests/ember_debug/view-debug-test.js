@@ -1,7 +1,7 @@
 /* jshint ignore:start */
 import Ember from "ember";
 import { module, test } from 'qunit';
-const { $ } = Ember;
+const { $, Application } = Ember;
 
 /* globals require */
 const EmberDebug = require('ember-debug/main').default;
@@ -24,30 +24,31 @@ function destroyTemplates() {
 }
 
 function setupApp() {
-  App = Ember.Application.create();
+  App = Application.create();
   App.setupForTesting();
   App.injectTestHelpers();
 
 
   App.Router.map(function() {
     this.route('simple');
-    this.route('comments', { resetNamespace: true }, function() {
-
-    });
+    this.route('comments', { resetNamespace: true }, function() {});
     this.route('posts', { resetNamespace: true });
   });
 
-  App.ApplicationView = View.extend();
-  App.ApplicationView.reopenClass({
-    toString() {
-      return 'App.ApplicationView';
+  App.ApplicationRoute = Route.extend({
+    model() {
+      return EmberObject.create({
+        toString() {
+          return 'Application model';
+        }
+      });
     }
   });
 
   App.SimpleRoute = Route.extend({
-    model: function() {
+    model() {
       return EmberObject.create({
-        toString: function() {
+        toString() {
           return 'Simple Model';
         }
       });
@@ -55,29 +56,27 @@ function setupApp() {
   });
 
   App.CommentsIndexRoute = Route.extend({
-    model: function() {
+    model() {
       return Ember.A(['first comment', 'second comment', 'third comment']);
     }
   });
 
-
   App.PostsRoute = Route.extend({
-    model: function() {
+    model() {
       return 'String as model';
     }
   });
 
-  App.SimpleController = Controller.extend();
-  App.SimpleController.reopenClass({
-    toString: function() {
-      return 'App.SimpleController';
+  App.ApplicationController = Controller.extend();
+  App.ApplicationController.reopenClass({
+    toString() {
+      return 'App.ApplicationController';
     }
   });
-
-  App.SimpleView = View.extend();
-  App.SimpleView.reopenClass({
-    toString: function() {
-      return 'App.SimpleView';
+  App.SimpleController = Controller.extend();
+  App.SimpleController.reopenClass({
+    toString() {
+      return 'App.SimpleController';
     }
   });
 
@@ -123,19 +122,11 @@ test("Simple View Tree", async function t(assert) {
   let tree = message.tree;
   let value = tree.value;
   assert.equal(tree.children.length, 1);
-  assert.equal(value.controller.name, 'Ember.Controller');
-  assert.equal(value.viewClass, 'App.ApplicationView');
+  assert.equal(value.controller.name, 'App.ApplicationController');
+  assert.equal(value.viewClass, '(unknown mixin)');
   assert.equal(value.name, 'application');
   assert.equal(value.tagName, 'div');
   assert.equal(value.template, 'application');
-
-  let child = tree.children[0];
-  let childValue = child.value;
-  assert.equal(childValue.controller.name, 'App.SimpleController');
-  assert.equal(childValue.viewClass, 'App.SimpleView');
-  assert.equal(childValue.name, 'simple');
-  assert.equal(childValue.tagName, 'div');
-  assert.equal(childValue.template, 'simple');
 });
 
 test("Highlight a view", async function t(assert) {
@@ -147,21 +138,24 @@ test("Highlight a view", async function t(assert) {
     }
   });
 
+  run(() => {
+    port.trigger('view:setOptions', { options: { components: true } });
+  });
+
   await visit('/simple');
   let tree = message.tree;
   port.trigger('view:showLayer', {
-    objectId: tree.children[0].value.objectId
+    objectId: tree.value.objectId
   });
   await wait();
   layerDiv = find('[data-label=layer-div]');
   assert.ok(layerDiv.is(':visible'));
-  assert.equal(find('[data-label=layer-controller]', layerDiv).text(), 'App.SimpleController');
-  assert.equal(find('[data-label=layer-model]', layerDiv).text(), 'Simple Model');
-  assert.equal(find('[data-label=layer-view]', layerDiv).text(), 'App.SimpleView');
+  assert.equal(find('[data-label=layer-model]', layerDiv).text(), 'Application model');
+  assert.equal(find('[data-label=layer-view]', layerDiv).text(), '(unknown mixin)');
 
   await click('[data-label=layer-controller]', layerDiv);
 
-  let controller = App.__container__.lookup('controller:simple');
+  let controller = App.__container__.lookup('controller:application');
   assert.equal(name, 'objectInspector:updateObject');
   assert.equal(controller.toString(), message.name);
   name = null;
@@ -170,7 +164,7 @@ test("Highlight a view", async function t(assert) {
   await click('[data-label=layer-model]', layerDiv);
 
   assert.equal(name, 'objectInspector:updateObject');
-  assert.equal(message.name, 'Simple Model');
+  assert.equal(message.name, 'Application model');
 
   await click('[data-label=layer-close]');
 
@@ -220,9 +214,9 @@ test("Highlighting Views on hover", async function t(assert) {
   let previewDiv = find('[data-label=preview-div]');
   assert.ok(previewDiv.is(':visible'));
   assert.equal(find('[data-label=layer-component]').length, 0, "Components are not Highlighted by default");
-  assert.equal(find('[data-label=layer-controller]', previewDiv).text(), 'App.SimpleController');
-  assert.equal(find('[data-label=layer-model]', previewDiv).text(), 'Simple Model');
-  assert.equal(find('[data-label=layer-view]', previewDiv).text(), 'App.SimpleView');
+  assert.equal(find('[data-label=layer-controller]', previewDiv).text(), 'App.ApplicationController');
+  assert.equal(find('[data-label=layer-model]', previewDiv).text(), 'Application model');
+  assert.equal(find('[data-label=layer-view]', previewDiv).text(), '(unknown mixin)');
   run(() => port.trigger('view:setOptions', { options: { components: true } }));
   await wait();
 

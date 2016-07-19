@@ -222,10 +222,12 @@ test("Previewing / showing a view on the client", async function(assert) {
   viewTree.children = [];
   run(() => port.trigger('view:viewTree', { tree: viewTree }));
   await wait();
-  await triggerEvent('.js-view-item', 'mouseenter');
+  run(() => find('.js-view-item').mouseenter());
+  await wait();
   assert.equal(messageSent.name, 'view:previewLayer', "Client asked to preview layer");
   assert.equal(messageSent.message.objectId, 'applicationView', "Client sent correct id to preview layer");
-  await triggerEvent('.js-view-item', 'mouseleave');
+  run(() => find('.js-view-item').mouseleave());
+  await wait();
   assert.equal(messageSent.name, 'view:hidePreview', "Client asked to hide preview");
 });
 

@@ -10,7 +10,7 @@
     <div class="list__cell list__cell_spacer"></div>
   </div>
 
-  {{#list-content contentHeight=application.contentHeight}}
+  {{#x-list-content contentHeight=application.contentHeight}}
     {{#each model as |library|}}
       <div class="list__row js-library-row">
         <div class="list__cell list__cell_main list__cell_size_large">
@@ -21,5 +21,5 @@
         </div>
       </div>
     {{/each}}
-  {{/list-content}}
+  {{/x-list-content}}
 {{/x-list}}

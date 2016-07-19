@@ -11,11 +11,11 @@
       <div class="list__cell list__cell_spacer"></div>
     </div>
 
-    {{#list-content contentHeight=application.contentHeight}}
+    {{#x-list-content contentHeight=application.contentHeight}}
       {{#each filtered as |item|}}
         {{render-item model=item search=search}}
       {{/each}}
-    {{/list-content}}
+    {{/x-list-content}}
   {{/x-list}}
 {{else}}
   <div class="notice js-render-tree-empty">

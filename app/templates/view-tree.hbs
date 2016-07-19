@@ -22,7 +22,7 @@
     <div class="list__cell list__cell_spacer"></div>
   </div>
 
-  {{#list-content contentHeight=application.contentHeight}}
+  {{#x-list-content contentHeight=application.contentHeight}}
     {{#vertical-collection content=model defaultHeight=30 as |content|}}
       {{view-item
         model=content
@@ -36,5 +36,5 @@
         class="js-view-item"
       }}
     {{/vertical-collection}}
-  {{/list-content}}
+  {{/x-list-content}}
 {{/x-list}}

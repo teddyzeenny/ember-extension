@@ -52,7 +52,7 @@
     "broccoli-wrap": "0.0.2",
     "ember-ajax": "0.7.1",
     "ember-async-image": "0.1.1",
-    "ember-cli": "2.4.3",
+    "ember-cli": "2.5.0",
     "ember-cli-app-version": "^1.0.0",
     "ember-cli-babel": "^5.1.6",
     "ember-cli-dependency-checker": "^1.2.0",
@@ -83,7 +83,7 @@
     "loader.js": "^4.0.1",
     "mkdirp": "^0.5.1",
     "rimraf": "^2.5.2",
-    "smoke-and-mirrors": "github:teddyzeenny/smoke-and-mirrors#b67b93",
+    "smoke-and-mirrors": "github:teddyzeenny/smoke-and-mirrors#b0bf8a7",
     "yauzl": "^2.4.1"
   },
   "dependencies": {

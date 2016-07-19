@@ -1,5 +1,5 @@
 {{#x-list}}
-  {{#list-content contentHeight=application.contentHeight headerHeight=0}}
+  {{#x-list-content contentHeight=application.contentHeight headerHeight=0}}
     {{#vertical-collection content=filtered defaultHeight=30 as |content|}}
       <div class="list__row js-instance-row" {{action "inspectInstance" content}}>
         <div class="list__cell list__cell_main {{if content.inspectable 'list__cell_clickable'}}">
@@ -7,5 +7,5 @@
         </div>
       </div>
     {{/vertical-collection}}
-  {{/list-content}}
+  {{/x-list-content}}
 {{/x-list}}

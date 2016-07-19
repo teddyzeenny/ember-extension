@@ -19,7 +19,7 @@
       <div class="list__cell list__cell_spacer"></div>
     </div>
 
-    {{#list-content contentHeight=application.contentHeight}}
+    {{#x-list-content contentHeight=application.contentHeight}}
       {{#vertical-collection content=filtered defaultHeight=30 as |content|}}
         {{promise-item
           model=content
@@ -29,7 +29,7 @@
           sendValueToConsole="sendValueToConsole"
         }}
       {{/vertical-collection}}
-    {{/list-content}}
+    {{/x-list-content}}
 
   {{/x-list}}
 {{/if}}

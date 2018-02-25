@@ -21,12 +21,12 @@ const App = Application.extend({
 // creation.
 // issue: https://github.com/emberjs/ember.js/issues/10310
 // pr: https://github.com/emberjs/ember.js/pull/10597
-App.reopen({
-  buildInstance() {
-    this.buildRegistry();
-    return this._super(...arguments);
-  }
-});
+// App.reopen({
+//   buildInstance() {
+//     this.buildRegistry();
+//     return this._super(...arguments);
+//   }
+// });
 
 config.VERSION = version;
 
